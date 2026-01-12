@@ -1,0 +1,1 @@
+# state-management-claude-code-plugin
