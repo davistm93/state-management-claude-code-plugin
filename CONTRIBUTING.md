@@ -176,7 +176,7 @@ export async function main() {
     const result = await runMyCommand({ ... });
     console.log('Success:', result);
   } catch (error: any) {
-    console.error('❌ Error:', error.message);
+    console.error('ERROR: Error:', error.message);
     process.exit(1);
   }
 }
@@ -299,4 +299,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to State Manager! 🎉
+Thank you for contributing to State Manager!

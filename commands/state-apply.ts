@@ -73,7 +73,7 @@ Deployment, environment, and operational requirements.
 
 export async function main() {
   try {
-    console.log('\n⚠️  state-apply: Session integration pending\n');
+    console.log('\nWARNING: state-apply: Session integration pending\n');
     console.log('This command should be run after /state-plan to apply proposed changes.');
     console.log('\nCurrent limitation:');
     console.log('  - Requires session state management to read plan results');
@@ -91,10 +91,10 @@ export async function main() {
     // Example of what would happen with session state:
     // const patches = getFromSession('last_state_plan_patches');
     // await runStateApply({ repoPath, statePath, patches });
-    // console.log('✓ State file updated successfully');
+    // console.log('SUCCESS: State file updated successfully');
 
   } catch (error: any) {
-    console.error('\n❌ Error running state-apply\n');
+    console.error('\nERROR: Error running state-apply\n');
     console.error('Details:', error.message || error);
 
     if (process.env.DEBUG) {

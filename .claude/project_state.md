@@ -8,7 +8,7 @@
 
 **Directory Structure**: Standard plugin layout with `.claude-plugin/` at root, ready for installation into `~/.claude/plugins/state-manager/`
 
-**Data Flow**: Git operations → Architect analysis → State file reconciliation → Metadata tracking
+**Data Flow**: Git operations -> Architect analysis -> State file reconciliation -> Metadata tracking
 
 **Key Patterns**:
 - Plan & Apply workflow inspired by Terraform
@@ -25,7 +25,7 @@
 - **hooks/post-commit**: Optional git hook for suggesting state-plan after commits (configurable)
 - **lib/git-utils**: Git operations wrapper using simple-git (15 unit tests passing)
 - **lib/state-parser**: Markdown parser for extracting/updating state file sections (tested)
-- **tests/integration**: End-to-end workflow validation (status → plan → apply)
+- **tests/integration**: End-to-end workflow validation (status -> plan -> apply)
 - **docs/EXAMPLES.md**: Comprehensive command output examples for all scenarios
 - **CONTRIBUTING.md**: Development guidelines, testing practices, and workflow documentation
 

@@ -842,7 +842,7 @@ export async function getStateStatus(options: StateStatusOptions): Promise<State
   let message = '';
 
   if (isCurrent) {
-    message = '✓ State is current';
+    message = 'SUCCESS: State is current';
   } else {
     const parts: string[] = [];
 
@@ -851,7 +851,7 @@ export async function getStateStatus(options: StateStatusOptions): Promise<State
     }
 
     if (stateFileModified) {
-      parts.push('⚠️  State file manually edited - changes not validated');
+      parts.push('WARNING:  State file manually edited - changes not validated');
     }
 
     message = parts.join('\n');
@@ -1206,7 +1206,7 @@ cat > .claude/project_state.md << 'EOF'
 
 **Plugin Architecture**: Claude Code plugin using TypeScript with three core commands (state-plan, state-apply, state-status) and one specialized agent (architect).
 
-**Data Flow**: Git operations → Architect analysis → State file reconciliation → Metadata tracking
+**Data Flow**: Git operations -> Architect analysis -> State file reconciliation -> Metadata tracking
 
 **Key Patterns**:
 - Plan & Apply workflow inspired by Terraform
@@ -1343,10 +1343,10 @@ Shows current state drift metrics.
 
 **Output examples:**
 ```
-✓ State is current
+SUCCESS: State is current
 
 State is 5 commits behind
-⚠️  State file manually edited - changes not validated
+WARNING:  State file manually edited - changes not validated
 ```
 
 ## Configuration
@@ -1451,7 +1451,7 @@ git commit -m "feat: add JWT authentication"
 # Someone manually edited project_state.md
 
 /state-status
-# Output: "⚠️ State file manually edited - changes not validated"
+# Output: "WARNING: State file manually edited - changes not validated"
 
 /state-plan
 # Architect validates manual changes against actual code
@@ -1636,11 +1636,11 @@ Never let your architecture documentation fall out of sync again. The State Mana
 
 **Key Features:**
 
-✅ **Bidirectional Drift Detection** - Catches both code changes and manual edits
-✅ **AI-Powered Analysis** - Specialized Architect agent understands architectural significance
-✅ **Configurable Granularity** - Track everything or just major changes
-✅ **Git-Integrated** - Works seamlessly with your existing workflow
-✅ **Zero Lock-In** - State file is readable markdown, works without the plugin
+[YES] **Bidirectional Drift Detection** - Catches both code changes and manual edits
+[YES] **AI-Powered Analysis** - Specialized Architect agent understands architectural significance
+[YES] **Configurable Granularity** - Track everything or just major changes
+[YES] **Git-Integrated** - Works seamlessly with your existing workflow
+[YES] **Zero Lock-In** - State file is readable markdown, works without the plugin
 
 **Perfect For:**
 
@@ -1669,7 +1669,7 @@ A living `.claude/project_state.md` file tracking:
 
 # Later...
 /state-status
-# ✓ State is current
+# SUCCESS: State is current
 ```
 
 ## Screenshots
@@ -1721,9 +1721,9 @@ Edit `.claude/plugins/state-manager/.claude-plugin/config.json`:
 
 ## Support & Feedback
 
-- 🐛 **Issues**: [GitHub Issues]
-- 📖 **Docs**: [Full Documentation]
-- 💬 **Discussions**: [GitHub Discussions]
+- BUG: **Issues**: [GitHub Issues]
+- DOCS: **Docs**: [Full Documentation]
+- CHAT: **Discussions**: [GitHub Discussions]
 
 ## Version History
 
@@ -1755,15 +1755,15 @@ git commit -m "docs: add marketplace listing documentation"
 
 The plugin is now fully structured with:
 
-✅ Directory structure
-✅ Plugin manifest and configuration
-✅ Architect agent definition
-✅ Three core commands (plan, apply, status)
-✅ Git utilities and state parser
-✅ Initial state file template
-✅ Comprehensive README
-✅ Test coverage
-✅ Marketplace documentation
+[YES] Directory structure
+[YES] Plugin manifest and configuration
+[YES] Architect agent definition
+[YES] Three core commands (plan, apply, status)
+[YES] Git utilities and state parser
+[YES] Initial state file template
+[YES] Comprehensive README
+[YES] Test coverage
+[YES] Marketplace documentation
 
 **Next Steps:**
 

@@ -77,24 +77,27 @@ export async function main() {
   try {
     const result = await runStatePlan({ repoPath, statePath, configPath });
 
-    console.log('\n=== State Plan ===\n');
-    console.log(`Analyzed ${result.commitsAnalyzed} commit(s)\n`);
-    console.log('Summary:', result.analysis.summary);
-    console.log('\nProposed Changes:');
+    console.log('# State Plan\n');
+    console.log(`Analyzed **${result.commitsAnalyzed}** commit(s)\n`);
+    console.log('## Summary\n');
+    console.log(result.analysis.summary);
+    console.log('\n## Proposed Changes');
 
     for (const [section, content] of Object.entries(result.analysis.patches)) {
-      console.log(`\n[${section}]`);
+      console.log(`\n### ${section}`);
+      console.log('```markdown');
       console.log(content);
+      console.log('```');
     }
 
     if (result.analysis.questions && result.analysis.questions.length > 0) {
-      console.log('\nQuestions:');
-      result.analysis.questions.forEach(q => console.log(`  - ${q}`));
+      console.log('\n## Questions');
+      result.analysis.questions.forEach(q => console.log(`- ${q}`));
     }
 
-    console.log('\n\nRun `/state-apply` to commit these changes to project_state.md');
+    console.log('\n\n> Run `/state-apply` to commit these changes to `project_state.md`');
   } catch (error: any) {
-    console.error('\n❌ Error running state-plan\n');
+    console.error('\nERROR: Error running state-plan\n');
 
     if (error.code === 'ENOENT') {
       if (error.path?.includes('config.json')) {

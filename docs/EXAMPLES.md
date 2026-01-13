@@ -8,7 +8,7 @@ This document shows example outputs from each State Manager command.
 
 ```bash
 $ /state-status
-✓ State is current
+SUCCESS: State is current
 ```
 
 ### When commits are behind
@@ -22,7 +22,7 @@ State is 5 commits behind
 
 ```bash
 $ /state-status
-⚠️  State file manually edited - changes not validated
+WARNING:  State file manually edited - changes not validated
 ```
 
 ### When both conditions exist
@@ -30,7 +30,7 @@ $ /state-status
 ```bash
 $ /state-status
 State is 3 commits behind
-⚠️  State file manually edited - changes not validated
+WARNING:  State file manually edited - changes not validated
 ```
 
 ---
@@ -131,7 +131,7 @@ Run `/state-apply` to commit these changes to project_state.md
 ```bash
 $ /state-apply
 
-⚠️  state-apply: Session integration pending
+WARNING:  state-apply: Session integration pending
 
 This command should be run after /state-plan to apply proposed changes.
 
@@ -152,8 +152,8 @@ See Tech Debt in project_state.md for implementation status.
 ```bash
 $ /state-apply
 
-✓ Applied 4 section updates to project_state.md
-✓ Updated metadata (commit: abc123f, timestamp: 2026-01-12T20:30:00Z)
+SUCCESS: Applied 4 section updates to project_state.md
+SUCCESS:
 
 State file synchronized with commit abc123f
 ```
@@ -167,7 +167,7 @@ State file synchronized with commit abc123f
 ```bash
 $ /state-plan
 
-❌ Error running state-plan
+ERROR: Error running state-plan
 
 Config file not found. Make sure the plugin is properly installed.
 Expected location: /Users/you/.claude/plugins/state-manager/.claude-plugin/config.json
@@ -180,7 +180,7 @@ For help, see: README.md or run with DEBUG=1 for full stack trace
 ```bash
 $ /state-plan
 
-❌ Error running state-plan
+ERROR: Error running state-plan
 
 Current directory is not a git repository.
 State Manager requires git to track changes.
@@ -193,7 +193,7 @@ For help, see: README.md or run with DEBUG=1 for full stack trace
 ```bash
 $ /state-plan
 
-❌ Error running state-plan
+ERROR: Error running state-plan
 
 State file not found. This is normal for first-time use.
 A new state file will be created when you run /state-apply
@@ -219,11 +219,11 @@ Summary: Added authentication module...
 
 # 3. Apply the changes (when session integration is ready)
 $ /state-apply
-✓ Applied 4 section updates to project_state.md
+SUCCESS: Applied 4 section updates to project_state.md
 
 # 4. Verify state is current
 $ /state-status
-✓ State is current
+SUCCESS: State is current
 ```
 
 ---
@@ -251,7 +251,7 @@ $ npm test -- tests/integration.test.ts
 
 PASS tests/integration.test.ts
   State Management Integration
-    ✓ should complete full state management workflow (66 ms)
+    SUCCESS: should complete full state management workflow (66 ms)
 
 Test Suites: 1 passed, 1 total
 Tests:       1 passed, 1 total

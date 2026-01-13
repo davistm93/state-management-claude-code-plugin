@@ -76,10 +76,10 @@ Shows current state drift metrics.
 
 **Output examples:**
 ```
-✓ State is current
+SUCCESS: State is current
 
 State is 5 commits behind
-⚠️  State file manually edited - changes not validated
+WARNING: State file manually edited - changes not validated
 ```
 
 ## Configuration
@@ -184,7 +184,7 @@ git commit -m "feat: add JWT authentication"
 # Someone manually edited project_state.md
 
 /state-status
-# Output: "⚠️ State file manually edited - changes not validated"
+# Output: "WARNING: State file manually edited - changes not validated"
 
 /state-plan
 # Architect validates manual changes against actual code

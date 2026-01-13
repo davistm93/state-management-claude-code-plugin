@@ -24,11 +24,11 @@ Never let your architecture documentation fall out of sync again. The State Mana
 
 **Key Features:**
 
-✅ **Bidirectional Drift Detection** - Catches both code changes and manual edits
-✅ **AI-Powered Analysis** - Specialized Architect agent understands architectural significance
-✅ **Configurable Granularity** - Track everything or just major changes
-✅ **Git-Integrated** - Works seamlessly with your existing workflow
-✅ **Zero Lock-In** - State file is readable markdown, works without the plugin
+[YES] **Bidirectional Drift Detection** - Catches both code changes and manual edits
+[YES] **AI-Powered Analysis** - Specialized Architect agent understands architectural significance
+[YES] **Configurable Granularity** - Track everything or just major changes
+[YES] **Git-Integrated** - Works seamlessly with your existing workflow
+[YES] **Zero Lock-In** - State file is readable markdown, works without the plugin
 
 **Perfect For:**
 
@@ -57,7 +57,7 @@ A living `.claude/project_state.md` file tracking:
 
 # Later...
 /state-status
-# ✓ State is current
+# SUCCESS: State is current
 ```
 
 ## Screenshots
@@ -109,9 +109,9 @@ Edit `.claude/plugins/state-manager/.claude-plugin/config.json`:
 
 ## Support & Feedback
 
-- 🐛 **Issues**: [GitHub Issues]
-- 📖 **Docs**: [Full Documentation]
-- 💬 **Discussions**: [GitHub Discussions]
+- BUG: **Issues**: [GitHub Issues]
+- DOCS: **Docs**: [Full Documentation]
+- CHAT: **Discussions**: [GitHub Discussions]
 
 ## Version History
 

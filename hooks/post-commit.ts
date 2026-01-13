@@ -34,7 +34,7 @@ async function main() {
     }
 
     // Display suggestion to user
-    console.log('\n📊 State Manager: Changes detected!');
+    console.log('\nINFO: State Manager: Changes detected!');
     console.log('   Run `/state-plan` to review architectural impact');
     console.log('   or disable this message with auto_hooks: false\n');
 

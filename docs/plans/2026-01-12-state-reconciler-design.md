@@ -48,15 +48,15 @@ The system detects **bidirectional drift**:
 
 ```
 Developer runs /state-plan
-  ↓
+  |
 Command scans git since last sync
-  ↓
+  |
 Calls architect agent with diffs
-  ↓
+  |
 Agent returns analysis + patches
-  ↓
+  |
 Preview shown to developer
-  ↓
+  |
 On approval: /state-apply writes changes and updates metadata
 ```
 
@@ -93,8 +93,8 @@ On approval: /state-apply writes changes and updates metadata
 2. **Detect manual edits**: Check if `project_state.md` modified after last sync
 3. **Display**:
    - "State is X commits behind" (if drift exists)
-   - "⚠️ State file manually edited - changes not validated" (if edited)
-   - "✓ State is current" (if synced)
+   - "WARNING: State file manually edited - changes not validated" (if edited)
+   - "SUCCESS: State is current" (if synced)
 
 ## Architect Agent Design
 
