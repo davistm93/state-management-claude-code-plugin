@@ -18,7 +18,19 @@
 
 ## Active Modules
 
-- **commands/state-plan**: Analyzes git diffs and proposes state updates via architect agent (working, tested, improved error handling)
+- **commands/state-plan**: Analyzes git diffs and proposes state updates via architect agent (working, tested, improved error handling, markdown output)
+- **commands/state-apply**: Commits approved changes to project_state.md with metadata updates (informative placeholder with workarounds)
+- **commands/state-status**: Shows drift metrics (commits behind, manual edit detection, text-based status indicators)
+- **agents/architect**: Specialized LLM agent for architectural impact analysis
+- **hooks/post-commit**: Optional git hook for suggesting state-plan after commits (configurable)
+- **lib/git-utils**: Git operations wrapper using simple-git (15 unit tests passing)
+- **lib/state-parser**: Markdown parser for extracting/updating state file sections (tested)
+- **tests/integration**: End-to-end workflow validation (status -> plan -> apply)
+- **docs/EXAMPLES.md**: Comprehensive command output examples for all scenarios
+- **docs/TESTING.md**: Quick testing guide and script for local plugin development
+- **CONTRIBUTING.md**: Development guidelines, testing practices, and workflow documentation
+- **test-plugin.sh**: Executable test script for verifying plugin functionality before installation
+
 - **commands/state-apply**: Commits approved changes to project_state.md with metadata updates (informative placeholder with workarounds)
 - **commands/state-status**: Shows drift metrics (commits behind, manual edit detection)
 - **agents/architect**: Specialized LLM agent for architectural impact analysis
@@ -57,4 +69,4 @@
 - **Build Tool**: TypeScript compiler
 - **Plugin System**: Claude Code plugin manifest (.claude-plugin/plugin.json)
 
-<!-- STATE_METADATA: {"last_sync": "2026-01-12T21:00:00Z", "commit_sha": "9a155af", "version": "1.0", "granularity": "medium"} -->
+<!-- STATE_METADATA: {"last_sync":"2026-01-13T05:26:34.855Z","commit_sha":"60055718fb7f9718f123f0d1da6a5ba5be4afa67","version":"1.0","granularity":"medium"} -->

@@ -2,12 +2,20 @@
 description: Show current state drift metrics
 ---
 
-# State Status
+I'll check the current state drift metrics for you.
 
-I will run the state status script to check for drift.
+Step 1: Get status data
 
-<CLAUDE_TOOL name="run_shell_command">
-{
-  "command": "SCRIPT=\"dist/commands/state-status.js\"; if [ -f \"$SCRIPT\" ]; then node \"$SCRIPT\"; else node \"$HOME/.claude/plugins/state-manager/$SCRIPT\"; fi"
-}
-</CLAUDE_TOOL>
+Use the Bash tool to run:
+```bash
+node dist/lib-helpers/get-status.js
+```
+
+Step 2: Parse and display results
+
+Parse the JSON output and display the status in a formatted way:
+- Show the drift message
+- If drift > 0, include current SHA and last sync SHA
+- If drift > 0, suggest running `/state-plan` to analyze pending changes
+
+Display the results in a clean, readable format.

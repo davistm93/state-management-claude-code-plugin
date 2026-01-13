@@ -12,6 +12,6 @@
     "resolveJsonModule": true,
     "declaration": true
   },
-  "include": ["commands/**/*", "agents/**/*", "hooks/**/*", "lib/**/*"],
+  "include": ["commands/**/*", "agents/**/*", "hooks/**/*", "lib/**/*", "lib-helpers/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

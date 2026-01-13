@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-01-13T00:00:00Z",
+  "analysis": {
+    "summary": "This commit removes all emoji characters from the codebase, replacing them with text-based alternatives (e.g., SUCCESS, WARNING, ERROR, INFO) for better terminal compatibility and accessibility. The changes are purely cosmetic and do not affect architectural structure, functionality, or dependencies.",
+    "changes_by_category": {
+      "active_modules": [
+        "Updated commands/state-status.ts output to use 'SUCCESS:' and 'WARNING:' prefixes instead of emoji",
+        "Updated commands/state-plan.ts to use markdown formatting and 'ERROR:' prefix",
+        "Updated commands/state-apply.ts to use 'WARNING:', 'SUCCESS:', and 'ERROR:' prefixes",
+        "Added markdown skill files (state-plan.md, state-apply.md, state-status.md) for Claude Code integration",
+        "Updated hooks/post-commit.ts to use 'INFO:' prefix instead of emoji"
+      ]
+    },
+    "patches": {
+      "active_modules": "## Active Modules\n\n- **commands/state-plan**: Analyzes git diffs and proposes state updates via architect agent (working, tested, improved error handling, markdown output)\n- **commands/state-apply**: Commits approved changes to project_state.md with metadata updates (informative placeholder with workarounds)\n- **commands/state-status**: Shows drift metrics (commits behind, manual edit detection, text-based status indicators)\n- **agents/architect**: Specialized LLM agent for architectural impact analysis\n- **hooks/post-commit**: Optional git hook for suggesting state-plan after commits (configurable)\n- **lib/git-utils**: Git operations wrapper using simple-git (15 unit tests passing)\n- **lib/state-parser**: Markdown parser for extracting/updating state file sections (tested)\n- **tests/integration**: End-to-end workflow validation (status -> plan -> apply)\n- **docs/EXAMPLES.md**: Comprehensive command output examples for all scenarios\n- **docs/TESTING.md**: Quick testing guide and script for local plugin development\n- **CONTRIBUTING.md**: Development guidelines, testing practices, and workflow documentation\n- **test-plugin.sh**: Executable test script for verifying plugin functionality before installation"
+    },
+    "confidence": "high",
+    "questions": [],
+    "removals": []
+  },
+  "diffSummary": {
+    "commitsAnalyzed": 1,
+    "currentSha": "60055718fb7f9718f123f0d1da6a5ba5be4afa67"
+  }
+}

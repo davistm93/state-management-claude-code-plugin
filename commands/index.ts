@@ -1,4 +1,5 @@
 // Entry point for the plugin commands
-export { runStatePlan } from './state-plan';
-export { runStateApply } from './state-apply';
-export { getStateStatus } from './state-status';
+// All commands have been migrated to markdown (.md) files
+// This file is kept for backward compatibility but exports nothing
+
+export {};
