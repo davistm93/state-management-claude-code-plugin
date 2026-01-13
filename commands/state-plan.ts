@@ -93,8 +93,35 @@ export async function main() {
     }
 
     console.log('\n\nRun `/state-apply` to commit these changes to project_state.md');
-  } catch (error) {
-    console.error('Error running state-plan:', error);
+  } catch (error: any) {
+    console.error('\n❌ Error running state-plan\n');
+
+    if (error.code === 'ENOENT') {
+      if (error.path?.includes('config.json')) {
+        console.error('Config file not found. Make sure the plugin is properly installed.');
+        console.error('Expected location:', configPath);
+      } else if (error.path?.includes('project_state.md')) {
+        console.error('State file not found. This is normal for first-time use.');
+        console.error('A new state file will be created when you run /state-apply');
+      } else {
+        console.error('File not found:', error.path);
+      }
+    } else if (error.message?.includes('not a git repository')) {
+      console.error('Current directory is not a git repository.');
+      console.error('State Manager requires git to track changes.');
+    } else if (error.task?.commands) {
+      console.error('Git command failed:', error.task.commands.join(' '));
+      console.error('Details:', error.message);
+    } else {
+      console.error('Details:', error.message || error);
+    }
+
+    console.error('\nFor help, see: README.md or run with DEBUG=1 for full stack trace');
+
+    if (process.env.DEBUG) {
+      console.error('\nFull error:', error);
+    }
+
     process.exit(1);
   }
 }

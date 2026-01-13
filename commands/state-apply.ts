@@ -72,19 +72,37 @@ Deployment, environment, and operational requirements.
 }
 
 export async function main() {
-  console.log('state-apply: This command should be run after state-plan');
-  console.log('In a real CLI context, this would read the last plan result from session state');
+  try {
+    console.log('\n⚠️  state-apply: Session integration pending\n');
+    console.log('This command should be run after /state-plan to apply proposed changes.');
+    console.log('\nCurrent limitation:');
+    console.log('  - Requires session state management to read plan results');
+    console.log('  - This feature needs integration with Claude Code\'s session system');
+    console.log('\nWorkaround:');
+    console.log('  - Review the output from /state-plan');
+    console.log('  - Manually edit .claude/project_state.md if needed');
+    console.log('  - Update the STATE_METADATA commit_sha and last_sync timestamp');
+    console.log('\nSee Tech Debt in project_state.md for implementation status.\n');
 
-  // For now, just demonstrate the structure
-  const repoPath = process.cwd();
-  const statePath = path.join(repoPath, '.claude', 'project_state.md');
+    // For now, just demonstrate the structure
+    const repoPath = process.cwd();
+    const statePath = path.join(repoPath, '.claude', 'project_state.md');
 
-  // Example usage (would come from session state in real implementation)
-  // await runStateApply({
-  //   repoPath,
-  //   statePath,
-  //   patches: {}
-  // });
+    // Example of what would happen with session state:
+    // const patches = getFromSession('last_state_plan_patches');
+    // await runStateApply({ repoPath, statePath, patches });
+    // console.log('✓ State file updated successfully');
+
+  } catch (error: any) {
+    console.error('\n❌ Error running state-apply\n');
+    console.error('Details:', error.message || error);
+
+    if (process.env.DEBUG) {
+      console.error('\nFull error:', error);
+    }
+
+    process.exit(1);
+  }
 }
 
 if (require.main === module) {
