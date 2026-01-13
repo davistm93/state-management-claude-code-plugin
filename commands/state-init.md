@@ -9,9 +9,9 @@ Initialize a new `project_state.md` file by analyzing your codebase and setting 
 ## What This Command Does
 
 This command will:
-1. Analyze your project structure (languages, frameworks, dependencies)
+1. Analyze your project structure (languages, frameworks, dependencies) using Haiku 4.5 agent
 2. Create `.claude/project_state.md` with appropriate sections
-3. Configure `.claude.md` to automatically load state context
+3. Configure `CLAUDE.md` to automatically load state context
 4. Set up metadata tracking for future synchronization
 
 ## When to Use

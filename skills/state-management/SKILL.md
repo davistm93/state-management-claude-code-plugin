@@ -10,6 +10,8 @@ version: 2.0.0
 
 Maintain a living `project_state.md` file that tracks your project's architectural evolution. This skill automatically detects when code changes and keeps the state file synchronized.
 
+**Token Efficiency**: This skill uses haiku 4.5 agents for analysis tasks to minimize token usage.
+
 ## When This Skill Activates
 
 1. **Session start**: Check for drift between code and documented state
@@ -50,32 +52,23 @@ git log --oneline <last_sync_sha>..HEAD --no-merges
 
 ### 3. Change Analysis
 
-Understand what changed:
+**Use the analyze-changes agent for efficient analysis:**
 
-```bash
-# Get the diff since last sync
-git diff <last_sync_sha>..HEAD
+Launch the custom analyze-changes agent (uses Haiku 4.5 for token efficiency):
 
-# Get commit messages for context
-git log <last_sync_sha>..HEAD --oneline --no-merges
+```
+Use Task tool with:
+- subagent_type: "state-manager:analyze-changes"
+- description: "Analyze code changes"
+- prompt: "Analyze changes between commit <last_sync_sha> and HEAD. Read the current state file at .claude/project_state.md and recommend specific updates based on the git diff and commits."
 ```
 
-Read the current state file to understand existing documentation:
-
-Use the Read tool on `.claude/project_state.md`
-
-Analyze the changes and categorize by impact:
-
-- **New files/modules** → Update architectural or module sections
-- **Dependency changes** (package.json, requirements.txt, go.mod, etc.) → Update dependencies section
-- **Config changes** (.env, config files, docker) → Update infrastructure section
-- **TODOs/FIXMEs added** → Update tech debt section
-- **Removed files** → Remove from relevant sections
-
-Identify which H2 sections in the state file need updates. Match semantically:
-- "Dependencies", "Dependency Map", "External Libraries" all mean dependencies
-- "Modules", "Components", "Active Modules" all mean modules
-- "Infrastructure", "Deployment", "Configuration" all mean infra
+The analyze-changes agent will provide:
+- Summary of commits since last sync
+- Categorized changes (dependencies, files, modules, infrastructure)
+- Specific recommendations for which state file sections need updates
+- Exact content to add/update/remove for each section
+- Reasoning for each recommended change
 
 ### 4. Present Findings
 

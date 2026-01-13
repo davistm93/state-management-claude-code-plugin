@@ -1,6 +1,6 @@
 ---
 name: state-init
-description: Initialize a new project_state.md file for a project. Creates standard sections based on project type and configures .claude.md integration.
+description: Initialize a new project_state.md file for a project. Creates standard sections based on project type and configures CLAUDE.md integration.
 version: 2.0.0
 ---
 
@@ -9,6 +9,8 @@ version: 2.0.0
 ## Purpose
 
 Create a new `project_state.md` file by analyzing the current codebase and setting up automatic context loading for Claude.
+
+**Token Efficiency**: This skill uses haiku 4.5 agents for analysis tasks to minimize token usage.
 
 ## When This Skill Activates
 
@@ -36,36 +38,24 @@ mkdir -p .claude
 
 ### 3. Analyze Project Structure
 
-Discover what kind of project this is:
+**Use the analyze-project agent for efficient analysis:**
 
-**Check for language/framework indicators:**
+Launch the custom analyze-project agent (uses Haiku 4.5 for token efficiency):
 
-Use Glob tool to find:
-- `package.json` → Node.js/JavaScript project
-- `requirements.txt` or `pyproject.toml` → Python project
-- `go.mod` → Go project
-- `Cargo.toml` → Rust project
-- `pom.xml` or `build.gradle` → Java project
-- `Gemfile` → Ruby project
-
-**Check project type:**
-- API/web app: Look for routes/, api/, server.ts, app.py
-- CLI tool: Look for cli/, cmd/, bin/
-- Library: Look for lib/, src/ without server files
-
-**Get recent history:**
-
-```bash
-git log --oneline -20
+```
+Use Task tool with:
+- subagent_type: "state-manager:analyze-project"
+- description: "Analyze project structure"
+- prompt: "Analyze this project to determine its language, framework, project type, directory structure, dependencies, and purpose."
 ```
 
-This gives context on what the project does.
-
-**Read dependency files** using Read tool:
-- package.json → extract dependencies
-- requirements.txt → extract Python packages
-- go.mod → extract Go modules
-- etc.
+The analyze-project agent will provide a comprehensive analysis including:
+- Language & framework detection
+- Project type classification (API/CLI/Library/Plugin)
+- Directory structure mapping
+- Key dependencies list
+- Project purpose from commit history
+- Recommended state file sections
 
 ### 4. Propose Section Structure
 
@@ -189,12 +179,12 @@ Get current timestamp:
 date -u +"%Y-%m-%dT%H:%M:%SZ"
 ```
 
-### 7. Configure .claude.md Integration
+### 7. Configure CLAUDE.md Integration
 
-Check if `.claude.md` exists in project root:
+Check if `CLAUDE.md` exists in project root:
 
 ```bash
-test -f .claude.md && echo "exists" || echo "missing"
+test -f CLAUDE.md && echo "exists" || echo "missing"
 ```
 
 **If exists:**
@@ -204,7 +194,7 @@ Read the file using Read tool.
 Check if it already mentions `project_state.md`:
 
 ```bash
-grep -q "project_state.md" .claude.md && echo "found" || echo "missing"
+grep -q "project_state.md" CLAUDE.md && echo "found" || echo "missing"
 ```
 
 - If **found**: Don't modify (already configured)
@@ -212,7 +202,7 @@ grep -q "project_state.md" .claude.md && echo "found" || echo "missing"
 
 **If doesn't exist:**
 
-Create `.claude.md` with the integration section.
+Create `CLAUDE.md` with the integration section.
 
 **Integration section to append/create:**
 
@@ -239,7 +229,7 @@ Tell the user:
 "Created .claude/project_state.md with N sections:
 - [List section names]
 
-Also configured .claude.md to automatically load state context on every session.
+Also configured CLAUDE.md to automatically load state context on every session.
 
 The state-management skill will keep this file updated as you make changes!"
 

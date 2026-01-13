@@ -22,17 +22,17 @@ The plugin provides two complementary approaches to state management:
 **state-management skill** - Automatic state synchronization
 - Triggers at session start and after task completion
 - Checks if your code has changed since last state sync
-- If changes found, analyzes git diff and commits
+- If changes found, uses efficient Haiku 4.5 agent to analyze git diff and commits
 - Proposes updates to affected sections
 - On your approval, updates the state file
 - If no changes, continues silently (no interruption)
 
 **state-init skill** - Project initialization
 - Triggers when no state file exists
-- Analyzes your codebase (languages, frameworks, structure)
+- Uses efficient Haiku 4.5 agent to analyze your codebase (languages, frameworks, structure)
 - Proposes section structure based on project type
 - Generates initial content for each section
-- Configures `.claude.md` to automatically load state context
+- Configures `CLAUDE.md` to automatically load state context
 - Creates `.claude/project_state.md`
 
 ### 2. Commands (Manual)
@@ -178,9 +178,9 @@ At the bottom of every state file:
 
 This tracks when state was last synced and which commit it reflects.
 
-## Claude.md Integration
+## CLAUDE.md Integration
 
-During initialization, the plugin adds this to your `.claude.md`:
+During initialization, the plugin adds this to your `CLAUDE.md`:
 
 ```markdown
 ## Project State
@@ -253,6 +253,7 @@ Claude: [Proceeds normally with your question]
 4. **Project Adaptive**: Adapts to any project structure and language
 5. **Convention Over Config**: No configuration files needed
 6. **Simple**: Pure markdown, no build steps or dependencies
+7. **Token Efficient**: Uses Haiku 4.5 agents for analysis tasks, minimizing costs and latency
 
 ## Migration from v1.0
 
@@ -278,6 +279,9 @@ Your state file format is compatible. No data migration needed.
 state-manager/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin manifest
+├── agents/
+│   ├── analyze-project.md   # Haiku agent for project analysis
+│   └── analyze-changes.md   # Haiku agent for change detection
 ├── commands/
 │   ├── state-init.md        # Manual initialization command
 │   └── state-management.md  # Manual sync command

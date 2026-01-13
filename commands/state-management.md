@@ -10,7 +10,7 @@ Manually synchronize your `project_state.md` file with recent code changes by an
 
 This command will:
 1. Check for commits since last state sync
-2. Analyze changes in those commits
+2. Analyze changes in those commits using Haiku 4.5 agent
 3. Identify affected documentation sections
 4. Propose updates to keep state file current
 5. Update metadata with latest sync point
