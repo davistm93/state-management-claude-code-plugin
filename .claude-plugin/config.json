@@ -1,9 +1,0 @@
-{
-  "granularity": "medium",
-  "auto_hooks": false,
-  "ignore_patterns": [
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/fixtures/**"
-  ]
-}
