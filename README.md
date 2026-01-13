@@ -15,33 +15,37 @@ Instead of manual documentation that goes stale, this plugin **automatically det
 
 ## How It Works
 
-The plugin uses two skills that work behind the scenes:
+The plugin provides two complementary approaches to state management:
 
-### 1. Automatic State Sync (state-management skill)
+### 1. Skills (Automatic)
 
-**Triggers when:**
-- You start a Claude Code session
-- You finish implementing a feature
+**state-management skill** - Automatic state synchronization
+- Triggers at session start and after task completion
+- Checks if your code has changed since last state sync
+- If changes found, analyzes git diff and commits
+- Proposes updates to affected sections
+- On your approval, updates the state file
+- If no changes, continues silently (no interruption)
 
-**What it does:**
-1. Checks if your code has changed since last state sync
-2. If changes found, analyzes git diff and commits
-3. Proposes updates to affected sections
-4. On your approval, updates the state file
-5. If no changes, continues silently (no interruption)
+**state-init skill** - Project initialization
+- Triggers when no state file exists
+- Analyzes your codebase (languages, frameworks, structure)
+- Proposes section structure based on project type
+- Generates initial content for each section
+- Configures `.claude.md` to automatically load state context
+- Creates `.claude/project_state.md`
 
-### 2. Project Setup (state-init skill)
+### 2. Commands (Manual)
 
-**Triggers when:**
-- You don't have a state file yet
-- You explicitly ask to initialize state management
+For manual control, you can invoke commands directly:
 
-**What it does:**
-1. Analyzes your codebase (languages, frameworks, structure)
-2. Proposes section structure based on project type
-3. Generates initial content for each section
-4. Configures `.claude.md` to automatically load state context
-5. Creates `.claude/project_state.md`
+**`/state-init`** - Initialize state tracking
+- Manually create `project_state.md` for a new project
+- Useful when you want explicit control over initialization timing
+
+**`/state-management`** - Sync state manually
+- Force synchronization with recent code changes
+- Useful before creating PRs or after completing major features
 
 ## Installation
 
@@ -67,6 +71,7 @@ Once published:
 
 ### First Time Setup
 
+**Option 1: Automatic (Skill-based)**
 ```bash
 # Open Claude Code in your project
 # Claude will notice you don't have a state file
@@ -91,8 +96,20 @@ Claude: [Analyzes project]
         Created project_state.md and configured .claude.md!"
 ```
 
+**Option 2: Manual (Command-based)**
+```bash
+# Open Claude Code in your project
+# Run the initialization command
+
+You: "/state-init"
+
+Claude: [Analyzes project and creates state file]
+        "Initialized state tracking for your project!"
+```
+
 ### Daily Usage
 
+**Automatic Syncing**
 ```bash
 # You work on features normally
 git add .
@@ -110,6 +127,16 @@ Claude: "I found 3 commits since last sync. Changes affect:
 You: "yes"
 
 Claude: "Updated! Now tracking through commit a4f8c2b"
+```
+
+**Manual Syncing**
+```bash
+# After completing a feature, sync manually
+
+You: "/state-management"
+
+Claude: [Checks for changes and syncs state file]
+        "State synchronized with latest commits!"
 ```
 
 ## State File Structure
@@ -222,10 +249,10 @@ Claude: [Proceeds normally with your question]
 
 1. **Always Current**: Documentation stays synchronized with code
 2. **Better Context**: Claude understands your project architecture
-3. **Zero Friction**: Works automatically, no manual commands
-4. **Flexible**: Adapts to any project structure
+3. **Flexible Control**: Works automatically via skills, or manually via commands
+4. **Project Adaptive**: Adapts to any project structure and language
 5. **Convention Over Config**: No configuration files needed
-6. **Simple**: Pure markdown skills, no build steps
+6. **Simple**: Pure markdown, no build steps or dependencies
 
 ## Migration from v1.0
 
@@ -250,34 +277,48 @@ Your state file format is compatible. No data migration needed.
 ```
 state-manager/
 ├── .claude-plugin/
-│   └── plugin.json       # Plugin manifest
+│   └── plugin.json          # Plugin manifest
+├── commands/
+│   ├── state-init.md        # Manual initialization command
+│   └── state-management.md  # Manual sync command
 ├── skills/
 │   ├── state-management/
-│   │   └── SKILL.md     # Auto-sync skill
+│   │   └── SKILL.md         # Auto-sync skill
 │   └── state-init/
-│       └── SKILL.md     # Setup skill
+│       └── SKILL.md         # Setup skill
+├── docs/
+│   ├── MIGRATION-v1-to-v2.md
+│   └── TESTING.md
 └── README.md
 ```
 
 ### Contributing
 
-This is a pure skill-based plugin. To contribute:
+This is a pure markdown-based plugin. To contribute:
 
 1. Fork the repo
-2. Edit skill markdown files in `skills/*/SKILL.md`
+2. Edit files as needed:
+   - `skills/*/SKILL.md` - Automatic behavior
+   - `commands/*.md` - Manual commands
 3. Test by installing locally in `~/.claude/plugins/`
 4. Submit PR with description of changes
 
 No build step, no tests - just markdown!
 
-### Skill Editing Tips
+### Editing Tips
 
-Skills are instructions for Claude. When editing:
+**For Skills** (automatic behavior):
 - Be explicit about commands to run
 - Show expected outputs
 - Include error handling steps
 - Use code blocks for examples
 - Test by triggering the skill in a real project
+
+**For Commands** (manual invocation):
+- Include clear frontmatter with description
+- Explain what the command does and when to use it
+- Typically invoke the corresponding skill using the Skill tool
+- Test using the `/command-name` syntax in Claude Code
 
 ## License
 

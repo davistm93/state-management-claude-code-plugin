@@ -7,23 +7,24 @@ Version 2.0 transforms the State Manager from a command-based TypeScript plugin 
 ## What Changed
 
 ### Removed
-- ❌ Slash commands: `/state-plan`, `/state-apply`, `/state-status`
-- ❌ TypeScript source code (commands/, lib/, agents/, hooks/)
-- ❌ Build process (no more npm install, npm run build)
-- ❌ Dependencies (no package.json, no node_modules)
-- ❌ Test infrastructure (no jest)
-- ❌ Configuration files (was .claude-plugin/config.json)
+- Old slash commands: `/state-plan`, `/state-apply`, `/state-status`
+- TypeScript source code (commands/, lib/, agents/, hooks/)
+- Build process (no more npm install, npm run build)
+- Dependencies (no package.json, no node_modules)
+- Test infrastructure (no jest)
+- Configuration files (was .claude-plugin/config.json)
 
 ### Added
-- ✅ Automatic skills that trigger on session start and task completion
-- ✅ Pure markdown skill definitions (no code)
-- ✅ Flexible section structure (adapt to any project)
-- ✅ .claude.md integration for automatic context loading
+- Automatic skills that trigger on session start and task completion
+- Pure markdown skill definitions (no code)
+- Flexible section structure (adapt to any project)
+- .claude.md integration for automatic context loading
+- New slash commands: `/state-init`, `/state-management` (for manual control)
 
 ### Unchanged
-- ✅ State file location: `.claude/project_state.md`
-- ✅ Metadata format (fully compatible)
-- ✅ Git-based diff tracking
+- State file location: `.claude/project_state.md`
+- Metadata format (fully compatible)
+- Git-based diff tracking
 
 ## Migration Steps
 
@@ -77,10 +78,11 @@ User: /state-status
 Claude: [Shows drift metrics]
 ```
 
-**Manual**: You had to remember to run commands.
+**Manual workflow**: You had to remember to run multiple commands.
 
 ### After (v2.0)
 
+**Automatic workflow (default)**:
 ```
 [Session starts]
 
@@ -95,7 +97,15 @@ User: yes
 Claude: "Updated!"
 ```
 
-**Automatic**: Skills detect drift and offer to update.
+**Manual workflow (when you want control)**:
+```
+User: /state-management
+
+Claude: [Checks for changes and syncs]
+        "State synchronized with latest commits!"
+```
+
+**Key difference**: Skills detect drift automatically, but you can also trigger manually via commands.
 
 ## FAQ
 
