@@ -11,7 +11,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { runStatePlan } from '../commands/state-plan';
-import { runStateApply } from '../commands/state-apply';
+// import { runStateApply } from '../commands/state-apply'; // TODO: Use when session integration is ready
 import { getStateStatus } from '../commands/state-status';
 import { getCurrentCommitSha, getCommitsBetween } from '../lib/git-utils';
 import { parseStateFile } from '../lib/state-parser';
