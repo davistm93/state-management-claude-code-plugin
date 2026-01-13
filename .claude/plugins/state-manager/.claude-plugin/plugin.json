@@ -1,0 +1,56 @@
+{
+  "name": "state-manager",
+  "version": "1.0.0",
+  "description": "Terraform-inspired state reconciliation for tracking architectural evolution",
+  "author": "Claude State Manager Team",
+  "claude_version": ">=0.5.0",
+
+  "commands": {
+    "state-plan": {
+      "description": "Analyze code changes and propose state file updates",
+      "script": "./commands/state-plan.ts",
+      "category": "state"
+    },
+    "state-apply": {
+      "description": "Apply proposed state changes to project_state.md",
+      "script": "./commands/state-apply.ts",
+      "category": "state"
+    },
+    "state-status": {
+      "description": "Show current state drift metrics",
+      "script": "./commands/state-status.ts",
+      "category": "state"
+    }
+  },
+
+  "agents": {
+    "architect": {
+      "path": "./agents/architect.md",
+      "description": "Architectural impact analyzer"
+    }
+  },
+
+  "hooks": {
+    "post-commit": {
+      "script": "./hooks/post-commit.ts",
+      "description": "Suggest state-plan after commits",
+      "enabled": false
+    }
+  },
+
+  "config_schema": {
+    "granularity": {
+      "type": "enum",
+      "values": ["high", "medium", "fine"],
+      "default": "medium"
+    },
+    "auto_hooks": {
+      "type": "boolean",
+      "default": false
+    },
+    "ignore_patterns": {
+      "type": "array",
+      "default": ["**/*.test.ts", "**/*.spec.ts", "**/fixtures/**"]
+    }
+  }
+}
