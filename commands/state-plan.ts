@@ -70,8 +70,8 @@ export async function runStatePlan(options: PlanOptions): Promise<PlanResult> {
 export async function main() {
   const repoPath = process.cwd(); // User's project directory
   const statePath = path.join(repoPath, '.claude', 'project_state.md');
-  // Config is in the plugin directory (where this script is located)
-  const pluginDir = path.join(__dirname, '..');
+  // Config is in the plugin directory (dist/commands -> dist -> plugin root)
+  const pluginDir = path.join(__dirname, '..', '..');
   const configPath = path.join(pluginDir, '.claude-plugin', 'config.json');
 
   try {
