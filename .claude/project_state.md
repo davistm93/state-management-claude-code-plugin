@@ -1,6 +1,6 @@
 # Project State
 
-> Last updated: 2026-01-12 | Commit: 1a43755
+> Last updated: 2026-01-12 | Commit: 9a155af
 
 ## System Architecture
 
@@ -18,13 +18,16 @@
 
 ## Active Modules
 
-- **commands/state-plan**: Analyzes git diffs and proposes state updates via architect agent (working, tested)
-- **commands/state-apply**: Commits approved changes to project_state.md with metadata updates
+- **commands/state-plan**: Analyzes git diffs and proposes state updates via architect agent (working, tested, improved error handling)
+- **commands/state-apply**: Commits approved changes to project_state.md with metadata updates (informative placeholder with workarounds)
 - **commands/state-status**: Shows drift metrics (commits behind, manual edit detection)
 - **agents/architect**: Specialized LLM agent for architectural impact analysis
-- **lib/git-utils**: Git operations wrapper using simple-git (14 unit tests passing)
+- **hooks/post-commit**: Optional git hook for suggesting state-plan after commits (configurable)
+- **lib/git-utils**: Git operations wrapper using simple-git (15 unit tests passing)
 - **lib/state-parser**: Markdown parser for extracting/updating state file sections (tested)
 - **tests/integration**: End-to-end workflow validation (status → plan → apply)
+- **docs/EXAMPLES.md**: Comprehensive command output examples for all scenarios
+- **CONTRIBUTING.md**: Development guidelines, testing practices, and workflow documentation
 
 ## Dependency Map
 
@@ -37,11 +40,15 @@
 
 - TODO: Architect agent currently returns mock data - needs integration with Claude API or Claude Code agent system
 - TODO: Session state management for state-apply to read last plan result from state-plan
-- TODO: Post-commit hook implementation for automated state-plan suggestions
 - TODO: File context loading for complex changes (>50 lines)
+- TODO: Post-commit hook needs testing with actual git hook system
 - DONE: ~~Plugin directory structure (moved to root layout)~~
 - DONE: ~~Config path resolution (now uses plugin directory dynamically)~~
 - DONE: ~~Integration testing (tests/integration.test.ts added)~~
+- DONE: ~~Error handling improvements (context-aware error messages)~~
+- DONE: ~~Example documentation (docs/EXAMPLES.md with all scenarios)~~
+- DONE: ~~Contributing guide (development workflow and guidelines)~~
+- DONE: ~~Post-commit hook stub (hooks/post-commit.ts implemented)~~
 
 ## Infrastructure
 
@@ -50,4 +57,4 @@
 - **Build Tool**: TypeScript compiler
 - **Plugin System**: Claude Code plugin manifest (.claude-plugin/plugin.json)
 
-<!-- STATE_METADATA: {"last_sync": "2026-01-12T20:30:00Z", "commit_sha": "1a43755", "version": "1.0", "granularity": "medium"} -->
+<!-- STATE_METADATA: {"last_sync": "2026-01-12T21:00:00Z", "commit_sha": "9a155af", "version": "1.0", "granularity": "medium"} -->
