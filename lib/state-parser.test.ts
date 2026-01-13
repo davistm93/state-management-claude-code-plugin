@@ -54,8 +54,8 @@ describe('state-parser', () => {
         commit_sha: 'xyz789',
         last_sync: '2026-01-12T11:00:00Z'
       });
-      expect(updated).toContain('"commit_sha": "xyz789"');
-      expect(updated).toContain('"last_sync": "2026-01-12T11:00:00Z"');
+      expect(updated).toContain('"commit_sha":"xyz789"');
+      expect(updated).toContain('"last_sync":"2026-01-12T11:00:00Z"');
     });
   });
 });

@@ -1,9 +1,11 @@
 import { getLastSyncCommit, getDiffSinceCommit, getCurrentCommitSha } from './git-utils';
 
 describe('git-utils', () => {
+  const repoPath = process.cwd(); // Use actual repo path for integration tests
+
   describe('getCurrentCommitSha', () => {
     it('should return current HEAD commit SHA', async () => {
-      const sha = await getCurrentCommitSha('/fake/path');
+      const sha = await getCurrentCommitSha(repoPath);
       expect(sha).toMatch(/^[a-f0-9]{7,40}$/);
     });
   });
@@ -24,13 +26,15 @@ describe('git-utils', () => {
 
   describe('getDiffSinceCommit', () => {
     it('should get diff between commit and HEAD', async () => {
-      const diff = await getDiffSinceCommit('/fake/path', 'abc123');
+      // Using a recent commit from our history
+      const diff = await getDiffSinceCommit(repoPath, 'HEAD~5');
       expect(typeof diff).toBe('string');
     });
 
     it('should get uncommitted changes when no commit provided', async () => {
-      const diff = await getDiffSinceCommit('/fake/path', null);
+      const diff = await getDiffSinceCommit(repoPath, null);
       expect(typeof diff).toBe('string');
+      // May be empty if there are no uncommitted changes
     });
   });
 });
