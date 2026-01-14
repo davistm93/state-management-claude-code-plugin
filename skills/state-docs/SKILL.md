@@ -259,4 +259,4 @@ When updating sections:
 
 ---
 
-**Tools to use**: Bash (git commands, find), Glob (find docs), Read (load docs and state file), Edit (update sections), Write (create missing docs)
+**Tools to use**: Bash (git commands, find files), Read (load docs and state file), Edit (update sections), Write (create missing docs)
