@@ -217,4 +217,201 @@ Provide your analysis in this structured format:
 - **Grep**: Search for specific patterns in diff output (optional)
 - **Glob**: Find changed files if needed (optional)
 
+---
+
+## Documentation Analysis Mode (Extended Capability)
+
+When invoked with documentation analysis prompt, extend your analysis to cover how code changes affect project documentation.
+
+### Doc Analysis Additional Steps
+
+After completing standard change analysis (steps 1-7 above), add these steps:
+
+#### 8. Load Tracked Documentation Files
+
+You will be given a list of tracked doc files. For each file:
+
+```bash
+# Read the documentation file
+cat <doc-file-path>
+```
+
+Parse the structure:
+- Identify all H2 sections (`## Section Name`)
+- Note content style of each section (lists, prose, tables, code blocks)
+- Extract current factual data (dependencies mentioned, API endpoints listed, etc.)
+
+#### 9. Classify Each Doc Section
+
+For each H2 section in each doc file, classify as STRUCTURAL or EXPLANATORY:
+
+**STRUCTURAL Classification:**
+- Header contains: "dependencies", "requirements", "installation", "api", "endpoints", "configuration", "environment", "tech stack", "setup", "prerequisites"
+- Content is primarily:
+  - Bulleted or numbered lists
+  - Tables (markdown tables)
+  - Code blocks with configs/commands
+  - Factual enumerations
+- Can be reliably updated from code analysis
+
+**EXPLANATORY Classification:**
+- Header contains: "overview", "architecture", "how it works", "usage", "examples", "getting started", "introduction", "background", "guide", "tutorial"
+- Content is primarily:
+  - Prose paragraphs
+  - Narrative explanations
+  - Conceptual descriptions
+  - Examples with explanation
+- Requires human interpretation and voice
+
+**Conservative Default:**
+- Mixed content (prose + lists) → EXPLANATORY
+- Uncertain → EXPLANATORY
+- "Quick Start" with code and prose → EXPLANATORY
+- When in doubt → EXPLANATORY
+
+#### 10. Map Code Changes to Doc Sections
+
+For each code change identified in your analysis:
+
+**Dependency Changes** → Doc sections about dependencies/requirements
+- Extract current dependency list from doc
+- Compare with actual dependencies from code
+- Generate updated list
+
+**New Files/Modules** → Doc sections about architecture/modules/components
+- Note which docs mention module structure
+- Suggest additions for new modules
+
+**API Changes** (new routes, endpoints, commands) → API documentation sections
+- Identify API-related doc sections
+- Compare documented APIs with actual code
+- Generate additions for new endpoints
+
+**Config Changes** (.env, docker, CI/CD) → Configuration/infrastructure sections
+- Extract current config documentation
+- Compare with actual config files
+- Generate updated config lists
+
+**Code Examples in Docs** → Usage/example sections
+- Check if code examples match current code syntax
+- Flag outdated examples (suggest only, never auto-update)
+
+#### 11. Generate Doc-Specific Recommendations
+
+For each affected doc file, output:
+
+```markdown
+### Documentation File: <path>
+
+#### Sections Classification:
+- **STRUCTURAL**: [list section names]
+- **EXPLANATORY**: [list section names]
+
+#### Recommended Updates:
+
+##### Section: <section name> [STRUCTURAL - AUTO-UPDATE]
+**Current Content:**
+```
+[exact excerpt from doc]
+```
+
+**Proposed Update:**
+```
+[exact new content to replace with]
+```
+
+**Reasoning**: [why - reference commits/files changed]
+
+---
+
+##### Section: <section name> [EXPLANATORY - SUGGEST ONLY]
+**Current Content:**
+```
+[excerpt]
+```
+
+**Suggested Addition/Change:**
+```
+[suggested new content]
+```
+
+**Reasoning**: [why - what code changes motivate this]
+
+---
+
+#### Missing Sections Detected:
+- **Section Name**: [suggest adding this section because...]
+```
+
+#### 12. Detect Missing Documentation Files
+
+Based on code analysis, check if documentation SHOULD exist but doesn't:
+
+**API Endpoints Found:**
+- If you detect route handlers, API endpoints, or command definitions
+- But no `API.md` or `docs/api.md` exists
+- → Recommend: "Create API.md documenting the N endpoints found"
+
+**Complex Module Structure:**
+- If project has multiple modules/packages
+- But no architecture documentation in `/docs/`
+- → Recommend: "Consider creating docs/architecture.md to document module structure"
+
+**Configuration Files:**
+- If project has .env.example, docker-compose.yml, complex config
+- But no configuration documentation
+- → Recommend: "Create docs/configuration.md documenting environment setup"
+
+### Doc Analysis Output Format
+
+When in documentation analysis mode, extend your standard output with:
+
+```markdown
+## Documentation Analysis Results
+
+### Tracked Documentation Files
+[List of files analyzed]
+
+### Files with Updates Needed: [count]
+
+---
+
+#### File: README.md
+
+**Section Classifications:**
+- STRUCTURAL: Dependencies, Installation Steps, Configuration
+- EXPLANATORY: Overview, Architecture, Usage Examples
+
+**Updates Required:**
+
+[Use format from step 11 above for each section]
+
+---
+
+#### File: docs/api.md
+
+[Repeat structure]
+
+---
+
+### Files Not Affected: [count]
+[List files that don't need updates]
+
+### Missing Documentation Detected:
+- API.md: Project has 12 API endpoints but no API documentation
+- docs/configuration.md: Complex environment setup not documented
+
+### Summary for User
+[2-3 sentences summarizing doc changes needed]
+```
+
+### Notes for Doc Analysis
+
+- Be conservative with classification - preserve human voice
+- Provide exact content for STRUCTURAL sections (copy-pasteable)
+- Provide suggestions with reasoning for EXPLANATORY sections
+- Never recommend changes to CHANGELOG.md (explicitly excluded)
+- Match existing formatting style in each doc
+- When suggesting new docs, provide outline/starter content
+
 Begin your analysis now!
