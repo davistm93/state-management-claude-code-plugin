@@ -168,6 +168,55 @@ When there's no drift (no commits since last sync):
 
 This keeps the skill invisible when there's nothing to do.
 
+## Post-Completion Prompt
+
+After successfully updating project_state.md, check if documentation might also need updating.
+
+### Check for Docs Drift
+
+After updating state file metadata, check if docs are also out of sync:
+
+```bash
+# Extract last_docs_sync_commit_sha from metadata
+tail -10 .claude/project_state.md | grep -o '"last_docs_sync_commit_sha": "[^"]*"' | cut -d'"' -f4
+```
+
+If `last_docs_sync_commit_sha` is found:
+```bash
+# Check if there are commits since last docs sync
+git log --oneline <last_docs_sync_sha>..HEAD --no-merges | wc -l
+```
+
+- If **no commits since docs sync**: Don't prompt, docs are current
+- If **commits found**: Prompt user about doc updates
+
+If `last_docs_sync_commit_sha` is NOT found in metadata:
+- This means docs have never been synced
+- Prompt user about doc updates
+
+### The Prompt
+
+If docs might be out of sync, present this option to the user:
+
+"✓ project_state.md updated successfully.
+
+I notice there are N commits since your documentation was last synced. Would you like to update project documentation (README, docs/, etc.) to reflect these changes?
+
+I can run `/state-docs` to analyze and update your docs now, or you can run it manually later."
+
+**On user approval:**
+- Invoke the state-docs skill: Use Skill tool with skill="state-manager:state-docs"
+
+**On user decline:**
+- Continue normally
+
+### Don't Over-Prompt
+
+- Only prompt if there's actual drift (commits since last docs sync)
+- Keep it brief and actionable
+- Make it easy to decline
+- Don't prompt every time - only when state file was updated
+
 ---
 
 **Tools to use**: Bash (git commands), Read (load state file), Edit (update sections)
