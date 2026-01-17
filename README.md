@@ -25,6 +25,7 @@ The plugin provides two complementary approaches to state management:
 - If changes found, uses efficient Haiku 4.5 agent to analyze git diff and commits
 - Proposes updates to affected sections
 - On your approval, updates the state file
+- After updating state, optionally prompts to sync documentation
 - If no changes, continues silently (no interruption)
 
 **state-init skill** - Project initialization
@@ -34,6 +35,15 @@ The plugin provides two complementary approaches to state management:
 - Generates initial content for each section
 - Configures `CLAUDE.md` to automatically load state context
 - Creates `.claude/project_state.md`
+
+**state-docs skill** - Documentation synchronization
+- Triggers manually via `/state-docs` command or post-state-management prompt
+- Uses Haiku 4.5 agent to analyze commits for documentation impact
+- Detects trackable docs (README.md, docs/*, api/*)
+- Classifies doc sections as STRUCTURAL (auto-update) or EXPLANATORY (suggest-only)
+- Processes documents one at a time with user approval
+- Updates metadata with last docs sync point
+- Can suggest creating missing documentation files
 
 ### 2. Commands (Manual)
 
@@ -46,6 +56,13 @@ For manual control, you can invoke commands directly:
 **`/state-management`** - Sync state manually
 - Force synchronization with recent code changes
 - Useful before creating PRs or after completing major features
+- Optionally prompts to sync documentation after state updates
+
+**`/state-docs`** - Sync documentation manually
+- Synchronize project documentation with recent code changes
+- Analyzes commits since last docs sync
+- Updates README.md, docs/*, and other tracked files
+- Uses hybrid strategy: auto-updates factual sections, suggests changes for narrative sections
 
 ## Installation
 
@@ -137,6 +154,47 @@ You: "/state-management"
 
 Claude: [Checks for changes and syncs state file]
         "State synchronized with latest commits!"
+```
+
+**Documentation Synchronization**
+```bash
+# After syncing state, keep docs current
+
+You: "/state-docs"
+
+Claude: "I'll analyze your commits and update documentation.
+        Found 3 commits affecting:
+        - API endpoints (new auth routes)
+        - Dependencies (jsonwebtoken added)
+        - Configuration (new env vars)
+
+        Processing README.md (1 of 2)...
+
+        AUTO-UPDATE SECTIONS:
+        • Dependencies - will add jsonwebtoken@9.0.0
+
+        SUGGESTED CHANGES:
+        • Installation - new build step recommended
+
+        Apply these updates?"
+
+You: "yes"
+
+Claude: "Updated README.md! Processed 2 docs, synced through commit a4f8c2b"
+```
+
+Or use the automatic prompt:
+```bash
+# State-management skill can prompt doc sync after state update
+
+Claude: "✓ project_state.md updated successfully.
+
+        I noticed 2 commits since your docs were last synced.
+        Would you like to update documentation?"
+
+You: "yes"
+
+Claude: [Runs /state-docs sync process]
 ```
 
 ## State File Structure
@@ -281,15 +339,18 @@ state-manager/
 │   └── plugin.json          # Plugin manifest
 ├── agents/
 │   ├── analyze-project.md   # Haiku agent for project analysis
-│   └── analyze-changes.md   # Haiku agent for change detection
+│   └── analyze-changes.md   # Haiku agent for change detection with doc analysis
 ├── commands/
 │   ├── state-init.md        # Manual initialization command
-│   └── state-management.md  # Manual sync command
+│   ├── state-management.md  # Manual sync command
+│   └── state-docs.md        # Manual documentation sync command
 ├── skills/
 │   ├── state-management/
-│   │   └── SKILL.md         # Auto-sync skill
-│   └── state-init/
-│       └── SKILL.md         # Setup skill
+│   │   └── SKILL.md         # Auto-sync skill with doc prompt
+│   ├── state-init/
+│   │   └── SKILL.md         # Setup skill
+│   └── state-docs/
+│       └── SKILL.md         # Documentation sync skill
 ├── docs/
 │   ├── MIGRATION-v1-to-v2.md
 │   └── TESTING.md

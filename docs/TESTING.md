@@ -113,6 +113,55 @@ claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
 
 **Expected**: Claude invokes the state-management skill and syncs the state file
 
+### Scenario 6: Test /state-docs Command
+
+```bash
+# In a project WITH .claude/project_state.md
+# Make some commits first
+git commit -m "feat: add new API endpoint"
+
+# Start Claude
+claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+
+# Inside Claude session
+/state-docs
+```
+
+**Expected**: Claude invokes the state-docs skill, analyzes commits, and updates documentation (README.md, docs/*, etc.) with section-by-section approval
+
+### Scenario 7: Test state-docs Skill (Manual Trigger)
+
+```bash
+# In a project WITH .claude/project_state.md and tracked docs
+claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+```
+
+Then ask Claude:
+```
+Please read the state-docs skill from the state-manager plugin
+and follow its instructions to synchronize my project documentation.
+```
+
+**Expected**: Claude reads `skills/state-docs/SKILL.md` and syncs documentation with code changes
+
+### Scenario 8: Test Post-Completion Doc Prompt
+
+```bash
+# In a project WITH .claude/project_state.md
+# Make some commits
+git commit -m "refactor: update auth system"
+
+# Start Claude
+claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+```
+
+Ask Claude to sync state:
+```
+Please check if my project state needs updating.
+```
+
+**Expected**: Claude detects commits, syncs state, then optionally prompts about documentation sync
+
 ## Manual Skill Invocation
 
 You have multiple ways to invoke the state management functionality:
@@ -122,6 +171,7 @@ Invoke commands directly using slash syntax:
 ```
 /state-init
 /state-management
+/state-docs
 ```
 
 ### Option B: Explicit References
@@ -142,13 +192,21 @@ Have Claude read the skill file directly:
 - [ ] Plugin loads without errors (`/plugin` shows it)
 - [ ] `/state-init` command appears in command list
 - [ ] `/state-management` command appears in command list
+- [ ] `/state-docs` command appears in command list
 - [ ] `/state-init` command invokes skill and creates state file
 - [ ] `/state-management` command invokes skill and syncs state
+- [ ] `/state-docs` command invokes skill and syncs documentation
 - [ ] Can manually invoke state-init skill by asking Claude
+- [ ] Can manually invoke state-docs skill by asking Claude
 - [ ] state-init creates `.claude/project_state.md` correctly
 - [ ] state-init adds section to `.claude.md`
 - [ ] state-management detects commits and offers sync
-- [ ] Metadata is updated in project_state.md footer
+- [ ] state-management offers doc sync after state updates
+- [ ] state-docs detects trackable documentation files
+- [ ] state-docs classifies sections as STRUCTURAL/EXPLANATORY
+- [ ] state-docs applies auto-updates after approval
+- [ ] state-docs suggests changes for explanatory sections
+- [ ] Metadata includes last_docs_sync_commit_sha
 - [ ] Manual edits to state file are detected
 
 ## Debug Mode
