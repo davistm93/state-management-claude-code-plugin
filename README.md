@@ -13,6 +13,22 @@ The State Manager plugin keeps a synchronized documentation file (`.claude/proje
 
 Instead of manual documentation that goes stale, this plugin **automatically detects code changes** and updates the state file, giving Claude better context for suggestions and understanding your project.
 
+## Why Use This Plugin?
+
+**The Problem**: Claude Code sessions are stateless. Each time you start a new session, Claude has no memory of your project's architecture, recent changes, or design decisions unless you manually explain them.
+
+**Standard Approach**: Use `CLAUDE.md` to document your project. This works for static information, but requires manual updates every time your codebase evolves. Documentation quickly becomes outdated as you add features, refactor code, or update dependencies.
+
+**This Plugin's Solution**:
+- **Git-Aware Synchronization**: Automatically detects commits since last sync and identifies what changed
+- **Zero Configuration**: Adapts to any project structure, language, or framework without config files
+- **Always Current**: State file stays synchronized with your actual codebase
+- **Token Efficient**: Uses Haiku 4.5 agents for analysis, minimizing API costs and latency
+- **Flexible Control**: Works automatically via skills or manually via commands - you choose the workflow
+- **Documentation Sync**: Extends to README.md and other docs, keeping entire project documentation current
+
+Instead of manually documenting "we added JWT auth" in your CLAUDE.md after every feature, this plugin automatically detects the auth changes from your commits and updates the state file with the new architecture, dependencies, and modules. Claude always has accurate, current context about your project.
+
 ## How It Works
 
 The plugin provides two complementary approaches to state management:
@@ -38,12 +54,14 @@ The plugin provides two complementary approaches to state management:
 
 **state-docs skill** - Documentation synchronization
 - Triggers manually via `/state-docs` command or post-state-management prompt
+- Checks for/creates `docs/` folder to organize documentation
 - Uses Haiku 4.5 agent to analyze commits for documentation impact
 - Detects trackable docs (README.md, docs/*, api/*)
 - Classifies doc sections as STRUCTURAL (auto-update) or EXPLANATORY (suggest-only)
 - Processes documents one at a time with user approval
+- Creates missing docs in standard locations (README.md at root, others in docs/)
 - Updates metadata with last docs sync point
-- Can suggest creating missing documentation files
+- Follows industry-standard documentation structure
 
 ### 2. Commands (Manual)
 
@@ -60,8 +78,10 @@ For manual control, you can invoke commands directly:
 
 **`/state-docs`** - Sync documentation manually
 - Synchronize project documentation with recent code changes
+- Ensures `docs/` folder exists for organized documentation
 - Analyzes commits since last docs sync
 - Updates README.md, docs/*, and other tracked files
+- Creates missing docs in standard locations (docs/API.md, docs/ARCHITECTURE.md, etc.)
 - Uses hybrid strategy: auto-updates factual sections, suggests changes for narrative sections
 
 ## Installation
@@ -71,10 +91,12 @@ For manual control, you can invoke commands directly:
 ```bash
 # Clone to your Claude plugins directory
 cd ~/.claude/plugins
-git clone <this-repo> state-manager
+git clone <repository-url> state-manager
 
 # That's it! No build step required.
 ```
+
+Replace `<repository-url>` with the GitHub repository URL for this plugin.
 
 ### From Marketplace (Future)
 
@@ -162,11 +184,20 @@ Claude: [Checks for changes and syncs state file]
 
 You: "/state-docs"
 
-Claude: "I'll analyze your commits and update documentation.
-        Found 3 commits affecting:
+Claude: "Checking documentation structure...
+        Created docs/ folder for organized documentation.
+
+        Analyzing 3 commits for documentation impact:
         - API endpoints (new auth routes)
         - Dependencies (jsonwebtoken added)
         - Configuration (new env vars)
+
+        Detected API endpoints but no API documentation.
+        Create docs/API.md with 5 detected endpoints?"
+
+You: "yes"
+
+Claude: "Created docs/API.md (following standard documentation structure).
 
         Processing README.md (1 of 2)...
 
@@ -180,7 +211,8 @@ Claude: "I'll analyze your commits and update documentation.
 
 You: "yes"
 
-Claude: "Updated README.md! Processed 2 docs, synced through commit a4f8c2b"
+Claude: "Updated README.md! Processed 2 docs, created 1 new doc.
+        Synced through commit a4f8c2b"
 ```
 
 Or use the automatic prompt:
@@ -307,27 +339,26 @@ Claude: [Proceeds normally with your question]
 
 1. **Always Current**: Documentation stays synchronized with code
 2. **Better Context**: Claude understands your project architecture
-3. **Flexible Control**: Works automatically via skills, or manually via commands
-4. **Project Adaptive**: Adapts to any project structure and language
-5. **Convention Over Config**: No configuration files needed
-6. **Simple**: Pure markdown, no build steps or dependencies
-7. **Token Efficient**: Uses Haiku 4.5 agents for analysis tasks, minimizing costs and latency
+3. **Organized Documentation**: Automatically organizes docs in industry-standard `docs/` folder structure
+4. **Flexible Control**: Works automatically via skills, or manually via commands
+5. **Project Adaptive**: Adapts to any project structure and language
+6. **Convention Over Config**: No configuration files needed
+7. **Simple**: Pure markdown, no build steps or dependencies
+8. **Token Efficient**: Uses Haiku 4.5 agents for analysis tasks, minimizing costs and latency
 
-## Migration from v1.0
+## Migration from v1.0 (Existing Users Only)
 
-If you used the old command-based version:
+If you're upgrading from the command-only version (v1.0):
 
 ```bash
-# Your existing .claude/project_state.md works as-is!
-# Just update the plugin:
-
+# Update the plugin
 cd ~/.claude/plugins/state-manager
 git pull origin main
 
 # Restart Claude Code - skills activate automatically
 ```
 
-Your state file format is compatible. No data migration needed.
+Your existing `.claude/project_state.md` file is fully compatible. No data migration needed.
 
 ## Development
 
@@ -352,7 +383,6 @@ state-manager/
 │   └── state-docs/
 │       └── SKILL.md         # Documentation sync skill
 ├── docs/
-│   ├── MIGRATION-v1-to-v2.md
 │   └── TESTING.md
 └── README.md
 ```
@@ -385,10 +415,3 @@ No build step, no tests - just markdown!
 - Typically invoke the corresponding skill using the Skill tool
 - Test using the `/command-name` syntax in Claude Code
 
-## License
-
-MIT
-
-## Questions?
-
-Open an issue or discussion on GitHub!

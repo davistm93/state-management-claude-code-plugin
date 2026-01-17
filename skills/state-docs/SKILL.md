@@ -30,7 +30,29 @@ test -f .claude/project_state.md && echo "exists" || echo "missing"
 - If **missing**: "You need a project_state.md file for doc tracking. Run `/state-init` first."
 - If **exists**: Proceed to metadata extraction
 
-### 2. Extract Last Docs Sync Point
+### 2. Check and Organize Documentation Structure
+
+Ensure a `docs/` folder exists for organized documentation:
+
+```bash
+test -d docs && echo "exists" || echo "missing"
+```
+
+- If **missing**: Create it: `mkdir -p docs`
+- If **exists**: Continue
+
+This ensures all documentation (except root README.md) can be organized in a standard location.
+
+**Standard documentation structure**:
+- `README.md` - Project overview (stays at root)
+- `docs/API.md` - API reference and endpoints
+- `docs/ARCHITECTURE.md` - System architecture and design decisions
+- `docs/CONFIGURATION.md` - Configuration and environment variables
+- `docs/DEPLOYMENT.md` - Deployment and infrastructure
+- `docs/CONTRIBUTING.md` - Contribution guidelines
+- `docs/*.md` - Other domain-specific documentation
+
+### 3. Extract Last Docs Sync Point
 
 Read metadata from project_state.md:
 
@@ -43,7 +65,7 @@ Extract `last_docs_sync_commit_sha` from the JSON metadata.
 - If **missing**: Treat as first run, use initial commit or last 30 days
 - If **exists**: Use as baseline for change detection
 
-### 3. Check for New Commits
+### 4. Check for New Commits
 
 Find commits since last docs sync:
 
@@ -54,7 +76,7 @@ git log --oneline <last_docs_sync_sha>..HEAD --no-merges
 - If **no commits**: "No commits since last docs sync. Documentation is up to date."
 - If **commits found**: Proceed to doc detection
 
-### 4. Detect Trackable Documentation
+### 5. Detect Trackable Documentation
 
 Use glob patterns to find documentation files:
 
@@ -78,7 +100,7 @@ Keep only files matching trackable patterns:
 
 Store list of tracked docs for processing.
 
-### 5. Check for Uncommitted Changes
+### 6. Check for Uncommitted Changes
 
 For each tracked doc, check if it has uncommitted changes:
 
@@ -90,7 +112,7 @@ If uncommitted changes detected:
 - **Warn user**: "README.md has uncommitted changes. Proposed updates may conflict with your edits. Continue anyway?"
 - **Options**: Continue, commit first, or cancel
 
-### 6. Analyze Changes with Extended Agent
+### 7. Analyze Changes with Extended Agent
 
 **Use the analyze-changes agent with doc analysis mode:**
 
@@ -110,21 +132,35 @@ The agent will provide:
 - Specific update recommendations (auto-update vs suggest)
 - Detection of missing docs that should exist
 
-### 7. Check for Missing Documentation
+### 8. Check for Missing Documentation and Organize
 
-Agent may detect missing docs based on code analysis:
-- API endpoints found but no `API.md` → Suggest creation
-- Complex architecture but no `docs/architecture.md` → Suggest creation
+Agent may detect missing docs based on code analysis. Create them in the appropriate location following the standard structure:
 
-**Ask user**: "Detected API endpoints but no API.md found. Create API.md with detected endpoints?"
+**Missing documentation detection**:
+- API endpoints found but no API docs → Suggest `docs/API.md`
+- Complex architecture but no architecture docs → Suggest `docs/ARCHITECTURE.md`
+- Environment variables used but no config docs → Suggest `docs/CONFIGURATION.md`
+- Deployment scripts found but no deployment docs → Suggest `docs/DEPLOYMENT.md`
+
+**Placement rules**:
+- `README.md` - Always at root (project overview)
+- All other docs - Create in `docs/` folder for organization
+
+**Example prompt**: "Detected 5 API endpoints but no API documentation found. Create docs/API.md with detected endpoints?"
 
 If approved:
-- Generate initial content based on code analysis
-- Write file using Write tool
-- Add to git staging: `git add <new-doc>`
-- Notify: "API.md created. Review and commit when ready."
+1. Ensure `docs/` folder exists (from step 2)
+2. Generate initial content based on code analysis
+3. Write file to appropriate location using Write tool
+4. Add to git staging: `git add <new-doc>`
+5. Notify: "docs/API.md created with 5 endpoints. Review and commit when ready."
 
-### 8. Process Documents One at a Time
+**If root-level docs exist without docs/ organization**:
+- Note during analysis: "Found API.md at root. Standard location is docs/API.md."
+- Don't automatically move files (user may have reasons)
+- Track both locations in subsequent syncs
+
+### 9. Process Documents One at a Time
 
 For each affected doc (e.g., README.md, docs/api.md):
 
@@ -157,7 +193,7 @@ Would you like to apply these updates to README.md?
 **On decline**:
 - Skip this document, move to next
 
-### 9. Update Metadata
+### 10. Update Metadata
 
 After all docs processed, update project_state.md metadata:
 
@@ -231,7 +267,11 @@ The analyze-changes agent uses these heuristics:
 
 ### No Tracked Docs Found
 - Smart detection finds no matching files
-- "No documentation files found matching standard patterns. Create README.md?"
+- "No documentation files found. Would you like to create a standard documentation structure?"
+- If approved, create:
+  - `README.md` at root
+  - `docs/` folder
+  - Optionally suggest common docs based on codebase analysis
 
 ### Agent Failure
 - If analyze-changes agent errors or times out
@@ -250,13 +290,37 @@ When updating sections:
 6. **Links**: Use same link format (inline `[text](url)` vs reference `[text][ref]`)
 7. **Emphasis**: Match bold/italic patterns for consistency
 
+## Documentation Organization Benefits
+
+Following the `docs/` folder structure provides:
+
+1. **Clarity**: Clear separation between project root and documentation
+2. **Scalability**: Easy to add new docs without cluttering root directory
+3. **Convention**: Follows industry-standard patterns (Next.js, React, many OSS projects)
+4. **Discoverability**: Developers know to look in `docs/` for detailed information
+5. **Tool Support**: Many documentation tools (GitHub Pages, Docusaurus) expect `docs/` structure
+
+**Standard structure recap**:
+```
+project-root/
+├── README.md              # Project overview (root)
+├── docs/                  # Organized documentation
+│   ├── API.md            # API reference
+│   ├── ARCHITECTURE.md   # System design
+│   ├── CONFIGURATION.md  # Config & env vars
+│   ├── DEPLOYMENT.md     # Deployment guide
+│   └── *.md              # Other docs
+└── ...
+```
+
 ## Output Guidance
 
 - **Progress indicators**: "Processing README.md (1 of 3)..."
 - **Clear summaries**: Always show what will change before applying
 - **Undo reminder**: "You can use `git checkout` to revert doc changes if needed"
 - **Commit suggestion**: After updates, suggest committing docs: "Ready to commit updated documentation?"
+- **Organization notes**: When creating new docs, mention: "Created docs/API.md (following standard documentation structure)"
 
 ---
 
-**Tools to use**: Bash (git commands, find files), Read (load docs and state file), Edit (update sections), Write (create missing docs)
+**Tools to use**: Bash (git commands, find files, mkdir), Read (load docs and state file), Edit (update sections), Write (create missing docs)

@@ -1,5 +1,16 @@
 # Testing Your State Manager Plugin
 
+This guide explains how to test the State Manager plugin during development.
+
+## Setup
+
+Set the plugin path for easier testing:
+
+```bash
+# Replace with your actual plugin directory path
+export PLUGIN_PATH="/path/to/state-management-claude-code-plugin"
+```
+
 ## Quick Start
 
 1. **Navigate to a test project** (not your plugin directory):
@@ -9,7 +20,7 @@
 
 2. **Start Claude Code with your plugin**:
    ```bash
-   claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+   claude --plugin-dir $PLUGIN_PATH
    ```
 
 3. **Verify plugin is loaded**:
@@ -32,29 +43,25 @@ The plugin provides both skills and commands:
 - Give you explicit control over when to initialize or sync
 - Show up in command list when you type `/`
 
-## Known Issue: Skills Not in available_skills
-
-There's a known bug ([#16575](https://github.com/anthropics/claude-code/issues/16575)) where user-defined plugin skills don't appear in Claude's system context. However, **they still work** if Claude is explicitly told about them.
-
 ## Testing Scenarios
 
 ### Scenario 1: Test Plugin is Loaded
 
 ```bash
 # In any project
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 
 # Inside Claude session
 /plugin
 ```
 
-**Expected**: You see `state-manager v2.0.0` in the list
+**Expected**: You see `state-manager v1.0.0` in the list
 
 ### Scenario 2: Test state-init Skill (Manual Trigger)
 
 ```bash
 # In a test project without .claude/project_state.md
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 ```
 
 Then ask Claude:
@@ -74,7 +81,7 @@ and follow its instructions.
 git commit -m "test: changes"
 
 # Start Claude
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 ```
 
 Then ask Claude:
@@ -89,7 +96,7 @@ and check if my project state needs syncing.
 
 ```bash
 # In a test project without .claude/project_state.md
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 
 # Inside Claude session
 /state-init
@@ -105,7 +112,7 @@ claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
 git commit -m "test: changes"
 
 # Start Claude
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 
 # Inside Claude session
 /state-management
@@ -121,7 +128,7 @@ claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
 git commit -m "feat: add new API endpoint"
 
 # Start Claude
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 
 # Inside Claude session
 /state-docs
@@ -133,7 +140,7 @@ claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
 
 ```bash
 # In a project WITH .claude/project_state.md and tracked docs
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 ```
 
 Then ask Claude:
@@ -152,7 +159,7 @@ and follow its instructions to synchronize my project documentation.
 git commit -m "refactor: update auth system"
 
 # Start Claude
-claude --plugin-dir /Users/tdavis/Documents/state-management-claude-code-plugin
+claude --plugin-dir $PLUGIN_PATH
 ```
 
 Ask Claude to sync state:
@@ -232,7 +239,7 @@ For guaranteed invocation, use the `/state-init` and `/state-management` command
 For permanent installation:
 ```bash
 mkdir -p ~/.claude/plugins
-cp -r /Users/tdavis/Documents/state-management-claude-code-plugin ~/.claude/plugins/state-manager
+cp -r $PLUGIN_PATH ~/.claude/plugins/state-manager
 
 # Now loads automatically
 claude
