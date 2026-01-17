@@ -1,0 +1,12 @@
+{
+  "name": "state-manager",
+  "version": "1.0.0",
+  "description": "Automatically maintains project_state.md to track architectural evolution and provide context to Claude",
+  "author": {
+    "name": "stuff_td_says"
+  },
+  "homepage": "https://github.com/yourusername/state-manager",
+  "repository": "https://github.com/yourusername/state-manager",
+  "license": "MIT",
+  "keywords": ["state", "documentation", "architecture", "context", "project-tracking"]
+}
