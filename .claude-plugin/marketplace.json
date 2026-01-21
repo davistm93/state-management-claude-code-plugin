@@ -1,0 +1,26 @@
+{
+  "name": "stuff-td-says",
+  "description": "Claude Code plugins by stuff_td_says - productivity tools and workflow enhancements",
+  "owner": {
+    "name": "stuff_td_says",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "state-manager",
+      "source": {
+        "source": "github",
+        "repo": "davistm93/state-management-claude-code-plugin"
+      },
+      "description": "Automatically maintains project_state.md to track architectural evolution and provide context to Claude",
+      "version": "1.0.0",
+      "author": {
+        "name": "stuff_td_says"
+      },
+      "homepage": "https://github.com/davistm93/state-management-claude-code-plugin#readme",
+      "repository": "https://github.com/davistm93/state-management-claude-code-plugin",
+      "license": "MIT",
+      "keywords": ["state", "documentation", "architecture", "context", "project-tracking"]
+    }
+  ]
+}

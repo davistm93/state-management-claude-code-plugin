@@ -1,5 +1,8 @@
 # State Manager Plugin for Claude Code
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/davistm93/state-management-claude-code-plugin/releases)
+
 Automatically maintains a living `project_state.md` file that tracks your project's architectural evolution and provides rich context to Claude.
 
 ## What It Does
@@ -86,25 +89,27 @@ For manual control, you can invoke commands directly:
 
 ## Installation
 
-### For Personal Use (Local Development)
+### From Marketplace (Recommended)
+
+Add the marketplace to Claude Code:
+```bash
+/plugin marketplace add davistm93/state-management-claude-code-plugin
+```
+
+Then install the plugin:
+```bash
+/plugin install state-manager@stuff-td-says
+```
+
+### Manual Installation (Local Development)
 
 ```bash
 # Clone to your Claude plugins directory
 cd ~/.claude/plugins
-git clone <repository-url> state-manager
+git clone https://github.com/davistm93/state-management-claude-code-plugin.git state-manager
 
 # That's it! No build step required.
 ```
-
-Replace `<repository-url>` with the GitHub repository URL for this plugin.
-
-### From Marketplace (Future)
-
-Once published:
-1. Open Claude Code
-2. Go to Plugin Marketplace
-3. Search for "State Manager"
-4. Click Install
 
 ## Quick Start
 

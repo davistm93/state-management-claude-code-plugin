@@ -5,8 +5,11 @@
   "author": {
     "name": "stuff_td_says"
   },
-  "homepage": "https://github.com/yourusername/state-manager",
-  "repository": "https://github.com/yourusername/state-manager",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davistm93/state-management-claude-code-plugin.git"
+  },
+  "homepage": "https://github.com/davistm93/state-management-claude-code-plugin#readme",
   "keywords": ["state", "documentation", "architecture", "context", "project-tracking"]
 }
