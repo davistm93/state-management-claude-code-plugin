@@ -93,7 +93,7 @@ For manual control, you can invoke commands directly:
 
 Add the marketplace to Claude Code:
 ```bash
-/plugin marketplace add davistm93/state-management-claude-code-plugin
+/plugin marketplace add https://github.com/davistm93/state-management-claude-code-plugin
 ```
 
 Then install the plugin:
