@@ -7,9 +7,47 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+*~
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+.secrets/
+
+# Credentials
+*credentials*
+*secret*
+.npmrc
+.pypirc
 
 # Local testing
 .test-*
+test-output/
+coverage/
+
+# Node modules (if you add any tooling later)
+node_modules/
+npm-debug.log*
+
+# Python (if you add any tooling later)
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
 
 # Ralph Loop local state
 .claude/ralph-loop.local.md
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Backup files
+*.backup
+*.bak
+*.tmp
