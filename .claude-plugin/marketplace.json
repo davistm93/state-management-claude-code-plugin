@@ -8,10 +8,7 @@
   "plugins": [
     {
       "name": "state-manager",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/davistm93/state-management-claude-code-plugin.git"
-      },
+      "source": "./",
       "description": "Automatically maintains project_state.md to track architectural evolution and provide context to Claude",
       "version": "1.0.0",
       "author": {
