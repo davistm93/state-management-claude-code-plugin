@@ -23,14 +23,14 @@ Instead of manual documentation that goes stale, this plugin **automatically det
 **Standard Approach**: Use `CLAUDE.md` to document your project. This works for static information, but requires manual updates every time your codebase evolves. Documentation quickly becomes outdated as you add features, refactor code, or update dependencies.
 
 **This Plugin's Solution**:
-- **Git-Aware Synchronization**: Automatically detects commits since last sync and identifies what changed
-- **Zero Configuration**: Adapts to any project structure, language, or framework without config files
+- **Change-Aware Synchronization**: Automatically detects code changes since last sync — uses git commits when available, falls back to filesystem snapshots when git is absent
+- **Zero Configuration**: Adapts to any project structure, language, or framework without config files. Works with or without git
 - **Always Current**: State file stays synchronized with your actual codebase
 - **Token Efficient**: Uses Haiku 4.5 agents for analysis, minimizing API costs and latency
 - **Flexible Control**: Works automatically via skills or manually via commands - you choose the workflow
 - **Documentation Sync**: Extends to README.md and other docs, keeping entire project documentation current
 
-Instead of manually documenting "we added JWT auth" in your CLAUDE.md after every feature, this plugin automatically detects the auth changes from your commits and updates the state file with the new architecture, dependencies, and modules. Claude always has accurate, current context about your project.
+Instead of manually documenting "we added JWT auth" in your CLAUDE.md after every feature, this plugin automatically detects changes (from git commits or filesystem snapshots) and updates the state file with the new architecture, dependencies, and modules. Claude always has accurate, current context about your project.
 
 ## How It Works
 
@@ -40,8 +40,8 @@ The plugin provides two complementary approaches to state management:
 
 **state-management skill** - Automatic state synchronization
 - Triggers at session start and after task completion
-- Checks if your code has changed since last state sync
-- If changes found, uses efficient Haiku 4.5 agent to analyze git diff and commits
+- Checks if your code has changed since last state sync (via git or filesystem snapshots)
+- If changes found, uses efficient Haiku 4.5 agent to analyze the changes
 - Proposes updates to affected sections
 - On your approval, updates the state file
 - After updating state, optionally prompts to sync documentation
@@ -58,7 +58,7 @@ The plugin provides two complementary approaches to state management:
 **state-docs skill** - Documentation synchronization
 - Triggers manually via `/state-docs` command or post-state-management prompt
 - Checks for/creates `docs/` folder to organize documentation
-- Uses Haiku 4.5 agent to analyze commits for documentation impact
+- Uses Haiku 4.5 agent to analyze code changes for documentation impact
 - Detects trackable docs (README.md, docs/*, api/*)
 - Classifies doc sections as STRUCTURAL (auto-update) or EXPLANATORY (suggest-only)
 - Processes documents one at a time with user approval
@@ -82,7 +82,7 @@ For manual control, you can invoke commands directly:
 **`/state-docs`** - Sync documentation manually
 - Synchronize project documentation with recent code changes
 - Ensures `docs/` folder exists for organized documentation
-- Analyzes commits since last docs sync
+- Analyzes changes since last docs sync
 - Updates README.md, docs/*, and other tracked files
 - Creates missing docs in standard locations (docs/API.md, docs/ARCHITECTURE.md, etc.)
 - Uses hybrid strategy: auto-updates factual sections, suggests changes for narrative sections
@@ -153,7 +153,7 @@ Claude: [Analyzes project and creates state file]
 
 ### Daily Usage
 
-**Automatic Syncing**
+**Automatic Syncing (with git)**
 ```bash
 # You work on features normally
 git add .
@@ -173,6 +173,25 @@ You: "yes"
 Claude: "Updated! Now tracking through commit a4f8c2b"
 ```
 
+**Automatic Syncing (without git)**
+```bash
+# You work on features normally — no git needed
+# Next time you open Claude Code
+
+Claude: "I detected changes since last sync:
+        - 2 files added, 3 files modified
+
+        Changes affect:
+        - Active Modules: Added auth middleware
+        - Dependencies: Added jsonwebtoken
+
+        Update state file?"
+
+You: "yes"
+
+Claude: "Updated! Filesystem snapshot updated."
+```
+
 **Manual Syncing**
 ```bash
 # After completing a feature, sync manually
@@ -180,7 +199,7 @@ Claude: "Updated! Now tracking through commit a4f8c2b"
 You: "/state-management"
 
 Claude: [Checks for changes and syncs state file]
-        "State synchronized with latest commits!"
+        "State synchronized with latest changes!"
 ```
 
 **Documentation Synchronization**
@@ -192,7 +211,7 @@ You: "/state-docs"
 Claude: "Checking documentation structure...
         Created docs/ folder for organized documentation.
 
-        Analyzing 3 commits for documentation impact:
+        Analyzing recent changes for documentation impact:
         - API endpoints (new auth routes)
         - Dependencies (jsonwebtoken added)
         - Configuration (new env vars)
@@ -226,7 +245,7 @@ Or use the automatic prompt:
 
 Claude: "✓ project_state.md updated successfully.
 
-        I noticed 2 commits since your docs were last synced.
+        I noticed changes since your docs were last synced.
         Would you like to update documentation?"
 
 You: "yes"
@@ -259,8 +278,9 @@ Deployment, runtime requirements, configuration
 
 ## Metadata Tracking
 
-At the bottom of every state file:
+At the bottom of every state file, metadata tracks the last sync point.
 
+**Git mode** (when git is available):
 ```markdown
 <!-- STATE_METADATA
 {
@@ -271,7 +291,19 @@ At the bottom of every state file:
 -->
 ```
 
-This tracks when state was last synced and which commit it reflects.
+**Snapshot mode** (when git is unavailable):
+```markdown
+<!-- STATE_METADATA
+{
+  "last_sync_method": "snapshot",
+  "last_sync_timestamp": "2026-01-13T10:30:00Z",
+  "last_sync_snapshot": ".claude/state_snapshot.json",
+  "schema_version": "1.0"
+}
+-->
+```
+
+In snapshot mode, a manifest of file hashes is stored at `.claude/state_snapshot.json` and used to detect changes between sessions. The plugin automatically detects which mode to use and handles transitions if git becomes available or unavailable.
 
 ## CLAUDE.md Integration
 
@@ -292,11 +324,11 @@ This ensures Claude automatically loads your project context every session.
 
 ```
 [You implement authentication]
-git commit -m "feat: add JWT auth"
+[Commit your changes (or just save files if not using git)]
 
 [Open Claude Code]
 
-Claude: "I found 1 commit since last sync. Added JWT authentication.
+Claude: "I detected changes since last sync.
 
         This affects:
         - Active Modules: auth-service with JWT middleware
@@ -331,7 +363,7 @@ Claude: "Metadata updated. Your edits are now source of truth."
 ### Example: No Changes (Silent)
 
 ```
-[You open Claude Code, no commits since last sync]
+[You open Claude Code, no changes since last sync]
 
 [Nothing happens - skill is silent]
 

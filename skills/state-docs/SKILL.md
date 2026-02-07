@@ -10,6 +10,8 @@ version: 1.0.0
 
 Maintain accurate project documentation by detecting code changes and updating relevant doc sections. This skill processes documentation one file at a time, classifying sections as structural (auto-update) or explanatory (suggest only).
 
+**Works with or without git**: When git is available, uses commit-based change detection. When git is unavailable, falls back to filesystem snapshot comparison.
+
 **Token Efficiency**: This skill uses haiku 4.5 agents for analysis tasks to minimize token usage.
 
 ## When This Skill Activates
@@ -52,6 +54,14 @@ This ensures all documentation (except root README.md) can be organized in a sta
 - `docs/CONTRIBUTING.md` - Contribution guidelines
 - `docs/*.md` - Other domain-specific documentation
 
+### 2.5. Detect Environment
+
+```bash
+git rev-parse --git-dir 2>/dev/null && echo "git-available" || echo "no-git"
+```
+
+Store this result for use in later steps.
+
 ### 3. Extract Last Docs Sync Point
 
 Read metadata from project_state.md:
@@ -60,12 +70,16 @@ Read metadata from project_state.md:
 tail -10 .claude/project_state.md
 ```
 
-Extract `last_docs_sync_commit_sha` from the JSON metadata.
+Extract docs sync info from the JSON metadata:
+- In git mode: look for `last_docs_sync_commit_sha`
+- In snapshot mode: look for `last_docs_sync_timestamp`
 
-- If **missing**: Treat as first run, use initial commit or last 30 days
+- If **missing**: Treat as first run
 - If **exists**: Use as baseline for change detection
 
-### 4. Check for New Commits
+### 4. Check for Changes
+
+**Git mode** (git available and `last_docs_sync_commit_sha` present):
 
 Find commits since last docs sync:
 
@@ -75,6 +89,16 @@ git log --oneline <last_docs_sync_sha>..HEAD --no-merges
 
 - If **no commits**: "No commits since last docs sync. Documentation is up to date."
 - If **commits found**: Proceed to doc detection
+
+**Snapshot mode** (no git or `last_sync_method: "snapshot"`):
+
+Compare current filesystem against stored snapshot at `.claude/state_snapshot.json`:
+1. Scan trackable files and hash them
+2. Compare against stored manifest
+3. Build change summary (added/modified/deleted files)
+
+- If **no changes**: "No changes since last docs sync. Documentation is up to date."
+- If **changes detected**: Build change summary and proceed to doc detection
 
 ### 5. Detect Trackable Documentation
 
@@ -102,6 +126,8 @@ Store list of tracked docs for processing.
 
 ### 6. Check for Uncommitted Changes
 
+**Git mode only:**
+
 For each tracked doc, check if it has uncommitted changes:
 
 ```bash
@@ -112,9 +138,13 @@ If uncommitted changes detected:
 - **Warn user**: "README.md has uncommitted changes. Proposed updates may conflict with your edits. Continue anyway?"
 - **Options**: Continue, commit first, or cancel
 
+**Snapshot mode:** Skip this step (no concept of uncommitted changes without git).
+
 ### 7. Analyze Changes with Extended Agent
 
 **Use the analyze-changes agent with doc analysis mode:**
+
+**Git mode:**
 
 Launch the analyze-changes agent (uses Haiku 4.5):
 
@@ -125,8 +155,36 @@ Use Task tool with:
 - prompt: "Analyze commits between <last_docs_sync_sha> and HEAD for documentation impact. For each tracked doc file: <list>, read current content, classify sections as STRUCTURAL or EXPLANATORY, map code changes to affected sections, and generate update recommendations. Use conservative classification: when uncertain, classify as EXPLANATORY."
 ```
 
+**Snapshot mode:**
+
+Pass the pre-computed change summary to the agent:
+
+```
+Use Task tool with:
+- subagent_type: "state-manager:analyze-changes"
+- description: "Analyze docs impact"
+- prompt: "Analyze the following code changes for documentation impact. For each tracked doc file: <list>, read current content, classify sections as STRUCTURAL or EXPLANATORY, map code changes to affected sections, and generate update recommendations. Use conservative classification: when uncertain, classify as EXPLANATORY.
+
+change_summary:
+
+Added files:
+- <file-path> (<size> bytes)
+...
+
+Modified files:
+- <file-path> (was <old-size> bytes, now <new-size> bytes)
+...
+
+Deleted files:
+- <file-path>
+...
+
+[For each modified dependency file, include its current content]
+"
+```
+
 The agent will provide:
-- Summary of commits and code changes
+- Summary of changes
 - List of affected documentation files
 - Per-doc analysis with section classifications
 - Specific update recommendations (auto-update vs suggest)
@@ -152,7 +210,7 @@ If approved:
 1. Ensure `docs/` folder exists (from step 2)
 2. Generate initial content based on code analysis
 3. Write file to appropriate location using Write tool
-4. Add to git staging: `git add <new-doc>`
+4. If git available: add to git staging: `git add <new-doc>`
 5. Notify: "docs/API.md created with 5 endpoints. Review and commit when ready."
 
 **If root-level docs exist without docs/ organization**:
@@ -197,10 +255,16 @@ Would you like to apply these updates to README.md?
 
 After all docs processed, update project_state.md metadata:
 
-Get current commit and timestamp:
+Get current timestamp:
+```bash
+date -u +"%Y-%m-%dT%H:%M:%SZ"
+```
+
+**Git mode:**
+
+Get current commit SHA:
 ```bash
 git rev-parse HEAD
-date -u +"%Y-%m-%dT%H:%M:%SZ"
 ```
 
 Update metadata section using Edit tool:
@@ -218,6 +282,24 @@ Update metadata section using Edit tool:
 ```
 
 **Confirm completion**: "Documentation sync complete. Processed N docs, updated M sections. Now tracking through commit <short-sha>."
+
+**Snapshot mode:**
+
+Update the snapshot manifest by rescanning the filesystem. Then update metadata:
+
+```markdown
+<!-- STATE_METADATA
+{
+  "last_sync_method": "snapshot",
+  "last_sync_timestamp": "<existing-timestamp>",
+  "last_sync_snapshot": ".claude/state_snapshot.json",
+  "last_docs_sync_timestamp": "<new-timestamp>",
+  "schema_version": "1.0"
+}
+-->
+```
+
+**Confirm completion**: "Documentation sync complete. Processed N docs, updated M sections. Filesystem snapshot updated."
 
 ## Section Classification Logic
 
@@ -257,13 +339,14 @@ The analyze-changes agent uses these heuristics:
 - Present all suggestions, user accepts/rejects individually
 
 ### No Changes Detected
-- Commits exist but don't affect tracked docs
-- "Analyzed 5 commits. No documentation updates needed."
+- Changes exist but don't affect tracked docs
+- "Analyzed changes. No documentation updates needed."
 
-### Git Errors
-- If git commands fail, report error
-- Suggest checking repository state
-- Gracefully skip doc sync for this session
+### Git Errors / No Git Available
+- If git commands fail in git mode, check if git is still available
+- If git is gone: switch to snapshot mode for this and future syncs
+- If git is available but command failed: report error, gracefully skip
+- In snapshot mode: git errors don't apply
 
 ### No Tracked Docs Found
 - Smart detection finds no matching files
@@ -317,10 +400,10 @@ project-root/
 
 - **Progress indicators**: "Processing README.md (1 of 3)..."
 - **Clear summaries**: Always show what will change before applying
-- **Undo reminder**: "You can use `git checkout` to revert doc changes if needed"
-- **Commit suggestion**: After updates, suggest committing docs: "Ready to commit updated documentation?"
+- **Undo reminder**: Git mode: "You can use `git checkout` to revert doc changes if needed." Snapshot mode: omit this reminder.
+- **Commit suggestion**: Git mode: After updates, suggest committing docs: "Ready to commit updated documentation?" Snapshot mode: omit.
 - **Organization notes**: When creating new docs, mention: "Created docs/API.md (following standard documentation structure)"
 
 ---
 
-**Tools to use**: Bash (git commands, find files, mkdir), Read (load docs and state file), Edit (update sections), Write (create missing docs)
+**Tools to use**: Bash (git commands, find files, mkdir, shasum), Read (load docs, state file, snapshot manifest), Edit (update sections), Write (create missing docs, snapshot manifest)
