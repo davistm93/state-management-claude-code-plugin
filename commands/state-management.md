@@ -4,16 +4,17 @@ description: Sync project_state.md with recent code changes
 
 # Sync Project State
 
-Manually synchronize your `project_state.md` file with recent code changes by analyzing git commits and updating architectural documentation.
+Manually synchronize your `project_state.md` file with recent code changes by analyzing commits (or filesystem changes) and updating architectural documentation. Works with or without git.
 
 ## What This Command Does
 
 This command will:
-1. Check for commits since last state sync
-2. Analyze changes in those commits using Haiku 4.5 agent
-3. Identify affected documentation sections
-4. Propose updates to keep state file current
-5. Update metadata with latest sync point
+1. Detect whether git is available (uses filesystem snapshot comparison if not)
+2. Check for changes since last state sync
+3. Analyze those changes using Haiku 4.5 agent
+4. Identify affected documentation sections
+5. Propose updates to keep state file current
+6. Update metadata with latest sync point
 
 ## When to Use
 

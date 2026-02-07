@@ -1,7 +1,7 @@
 ---
 name: analyze-project
 model: haiku
-description: Efficiently analyze project structure, dependencies, and type for state initialization
+description: Efficiently analyze project structure, dependencies, and type for state initialization (works with or without git)
 ---
 
 # Project Analysis Agent
@@ -16,7 +16,7 @@ Analyze the current project and provide a structured report containing:
 2. **Project Type Classification**
 3. **Major Directories and Modules**
 4. **Key Dependencies**
-5. **Project Purpose** (from commit history)
+5. **Project Purpose** (from commit history or file structure analysis)
 
 ## Analysis Steps
 
@@ -97,6 +97,14 @@ List the top 10 most important dependencies (frameworks, ORMs, major libraries).
 
 ### 5. Understand Project Purpose
 
+First, check if git is available:
+
+```bash
+git rev-parse --git-dir 2>/dev/null && echo "git" || echo "no-git"
+```
+
+**If git is available:**
+
 Run git log to see recent activity:
 
 ```bash
@@ -107,6 +115,20 @@ Analyze commit messages to understand:
 - What features are being built
 - Main domain/purpose of the project
 - Recent development focus
+
+**If git is NOT available:**
+
+Infer project purpose from the information gathered in previous steps:
+- Read README.md if it exists (use Glob to find it, then Read to examine)
+- Analyze the project structure and directory names from Step 3
+- Review the dependencies from Step 4 to understand what the project uses
+- Look at package.json "description" field if present
+- Examine other documentation files (CHANGELOG.md, docs/, etc.)
+
+Synthesize this information to understand:
+- What the project is meant to do
+- Main domain/purpose
+- Key features indicated by directory structure and dependencies
 
 ## Output Format
 
@@ -138,7 +160,7 @@ Provide your analysis in this structured format:
 [... up to 10 dependencies]
 
 ### Project Purpose
-Based on commit history and structure:
+Based on commit history (if git available) or file structure analysis:
 
 [2-3 sentence description of what this project does]
 
@@ -156,7 +178,7 @@ Based on project type, recommend these sections:
 - If a file doesn't exist, don't error - just note it and continue
 - Focus on the most important information
 - Provide specific file paths when relevant (e.g., "Found Express routes in src/routes/")
-- If git is not initialized, note this and continue without commit history
+- If git is not initialized, note this and continue without commit history. Instead, analyze the README.md file (if present), examine the project structure from previous steps, review dependency file descriptions, and synthesize this information to understand the project's purpose
 
 ## Tools You Should Use
 

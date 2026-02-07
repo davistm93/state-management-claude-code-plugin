@@ -10,6 +10,8 @@ version: 2.0.0
 
 Create a new `project_state.md` file by analyzing the current codebase and setting up automatic context loading for Claude.
 
+**Works with or without git**: This skill automatically detects whether git is available. When git is present, it uses commit-based tracking. When git is unavailable, it falls back to filesystem snapshot tracking to detect changes between sessions.
+
 **Token Efficiency**: This skill uses haiku 4.5 agents for analysis tasks to minimize token usage.
 
 ## When This Skill Activates
@@ -36,6 +38,16 @@ test -f .claude/project_state.md && echo "exists" || echo "missing"
 mkdir -p .claude
 ```
 
+### 2.5. Detect Environment
+
+```bash
+git rev-parse --git-dir 2>/dev/null && echo "git-available" || echo "no-git"
+```
+
+Store this result for use in later steps.
+
+**Note**: This detection determines whether to use git-based or snapshot-based tracking.
+
 ### 3. Analyze Project Structure
 
 **Use the analyze-project agent for efficient analysis:**
@@ -54,8 +66,10 @@ The analyze-project agent will provide a comprehensive analysis including:
 - Project type classification (API/CLI/Library/Plugin)
 - Directory structure mapping
 - Key dependencies list
-- Project purpose from commit history
+- Project purpose from commit history or file structure analysis
 - Recommended state file sections
+
+**Note**: The analyze-project agent handles missing git gracefully. If git is unavailable, it will infer project purpose from file structure, directory organization, and dependency patterns instead of commit history.
 
 ### 4. Propose Section Structure
 
@@ -139,7 +153,21 @@ For each section, write initial content based on analysis:
 
 ### 6. Create State File
 
-Use Write tool to create `.claude/project_state.md` with:
+Use Write tool to create `.claude/project_state.md`.
+
+Get current timestamp:
+```bash
+date -u +"%Y-%m-%dT%H:%M:%SZ"
+```
+
+**If git is available** (from Step 2.5):
+
+Get current commit SHA:
+```bash
+git rev-parse HEAD
+```
+
+Write the state file with git-based metadata:
 
 ```markdown
 # Project State
@@ -154,10 +182,6 @@ Use Write tool to create `.claude/project_state.md` with:
 
 [Generated content]
 
-## [Section 3]
-
-[Generated content]
-
 ... (all proposed sections)
 
 <!-- STATE_METADATA
@@ -169,14 +193,68 @@ Use Write tool to create `.claude/project_state.md` with:
 -->
 ```
 
-Get current commit SHA:
-```bash
-git rev-parse HEAD
+**If git is NOT available** (from Step 2.5):
+
+First, generate a filesystem snapshot manifest. Scan the project for all trackable files, excluding ignored patterns.
+
+Default ignore patterns (used when no `.gitignore` exists):
+```
+node_modules/**, dist/**, build/**, .cache/**, vendor/**,
+__pycache__/**, *.pyc, *.pyo, *.log, *.lock, .DS_Store,
+*.swp, *.swo, .env, .env.*, *.sqlite, *.db, .claude/**
 ```
 
-Get current timestamp:
+If `.gitignore` exists, parse and merge its patterns with the defaults above.
+
+For each trackable file, compute its hash:
 ```bash
-date -u +"%Y-%m-%dT%H:%M:%SZ"
+shasum -a 256 <file>
+```
+
+Write the manifest to `.claude/state_snapshot.json`:
+```json
+{
+  "schema_version": "1.0",
+  "created_at": "<timestamp>",
+  "last_sync_at": "<timestamp>",
+  "files": {
+    "src/index.ts": {
+      "hash": "sha256:<hash>",
+      "size": 1234,
+      "mtime": "<iso-timestamp>"
+    }
+  },
+  "ignore_patterns": ["node_modules/**", "dist/**", "..."]
+}
+```
+
+Cap at ~10,000 files. If exceeded, warn user: "Project has over 10,000 trackable files. Consider adding ignore patterns to reduce scope."
+
+Write the state file with snapshot-based metadata:
+
+```markdown
+# Project State
+
+> Last updated: <current-date> | Tracking: filesystem snapshots
+
+## System Architecture
+
+[Generated content]
+
+## [Section 2]
+
+[Generated content]
+
+... (all proposed sections)
+
+<!-- STATE_METADATA
+{
+  "last_sync_method": "snapshot",
+  "last_sync_timestamp": "<current-timestamp-iso8601>",
+  "last_sync_snapshot": ".claude/state_snapshot.json",
+  "schema_version": "1.0"
+}
+-->
 ```
 
 ### 7. Configure CLAUDE.md Integration
@@ -237,19 +315,23 @@ The state-management skill will keep this file updated as you make changes!"
 
 ### Git Repository Not Initialized
 
-If `git rev-parse HEAD` fails:
+If git is not available (detected in Step 2.5):
 
-"This doesn't appear to be a git repository. I can create the state file, but won't be able to track commit history. Initialize git first with `git init` for full functionality."
+"This doesn't appear to be a git repository. I'll use filesystem snapshot tracking instead. This tracks file changes between sessions but without commit message context. You can switch to git-based tracking later by initializing git."
 
-Offer to continue anyway with placeholder SHA.
+Continue with snapshot-based initialization — generate the manifest and use snapshot metadata. Do not use a placeholder SHA.
 
 ### Empty Repository (No Commits)
 
-If no commits exist yet:
+**Git available but no commits:**
 
 Use "0000000000000000000000000000000000000000" as placeholder SHA.
 
 Tell user: "No commits yet. Make your first commit and the state file will start tracking properly."
+
+**No git available:**
+
+Use snapshot mode as described in Step 6. No placeholder SHA needed.
 
 ### No Dependencies Found
 
@@ -267,4 +349,4 @@ Focus on major directories only.
 
 ---
 
-**Tools to use**: Bash (git, file checks), Glob (discover files), Read (dependency files), Write (create files), Edit (update .claude.md)
+**Tools to use**: Bash (git, file checks, shasum), Glob (discover files), Read (dependency files), Write (create files, snapshot manifest), Edit (update .claude.md)

@@ -4,17 +4,18 @@ description: Analyze and update project documentation based on code changes
 
 # Sync Project Documentation
 
-Manually synchronize your project documentation (README.md, docs/, etc.) with recent code changes by analyzing git commits and updating relevant doc sections.
+Manually synchronize your project documentation (README.md, docs/, etc.) with recent code changes by analyzing commits (or filesystem changes) and updating relevant doc sections. Works with or without git.
 
 ## What This Command Does
 
 This command will:
-1. Detect all trackable documentation files using smart patterns
-2. Check for commits since last docs sync
-3. Analyze changes in those commits using Haiku 4.5 agent
-4. Classify doc sections as structural (auto-update) or explanatory (suggest only)
-5. Process one document at a time for focused review
-6. Update metadata with latest docs sync point
+1. Detect whether git is available (uses filesystem snapshot comparison if not)
+2. Detect all trackable documentation files using smart patterns
+3. Check for changes since last docs sync
+4. Analyze those changes using Haiku 4.5 agent
+5. Classify doc sections as structural (auto-update) or explanatory (suggest only)
+6. Process one document at a time for focused review
+7. Update metadata with latest docs sync point
 
 ## Smart Doc Detection
 
